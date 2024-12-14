@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./utils/db.js";
+import userRoute from "./routers/user.route.js";
 
 dotenv.config({});
 
@@ -18,6 +19,8 @@ const corsOption = {
     credentials: true,
 }
 app.use(cors(corsOption))
+
+app.use('/api/v1/user', userRoute)
 
 
 app.get("/",(req, res)=>{
