@@ -1,8 +1,9 @@
-import User from "../models/user.model.js";
+import {User} from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { Post } from "../models/post.model.js";
 
 export const register = async (req, res) => {
   try {
@@ -70,6 +71,16 @@ export const login = async (req, res) => {
           });
     }
 
+    const token = jwt.sign({userId: user._id}, process.env.SECRET_KEY,{expiresIn: '7d'});
+
+    // populate each post id in the post array
+    const populatedPost = await Promise.all(
+      user.posts.map( async (postId)=>{
+        const post = await Post.findById(postId);
+        if(post.author.equals(user._id)) return post;
+        return null;
+      })
+    )
     user = {
       _id: user._id,
       username: user.username,
@@ -78,9 +89,8 @@ export const login = async (req, res) => {
       bio: user.bio,
       followers: user.followers,
       folliwing: user.followings,
-      post: user.posts
+      posts: user.posts
     }
-    const token = jwt.sign({userId: user._id}, process.env.SECRET_KEY,{expiresIn: '7d'});
 
     return res.cookie('token', token, {httpOnly: true, sameSite: 'strict', maxAge: 7*24*60*60*1000}).json({
       message: `Welcome Back! ${user.username}`,

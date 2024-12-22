@@ -1,7 +1,8 @@
 import sharp from "sharp";
-import Post from "../models/post.model.js";
-import User from "../models/user.model.js";
-import Comment from "../models/comment.model.js";
+import {Post} from "../models/post.model.js";
+import {User} from "../models/user.model.js";
+import {Comment} from "../models/comment.model.js";
+import cloudinary from "../utils/cloudinary.js";
 export const addNewPost = async (req, res) => {
   try {
     const { caption } = req.body;
@@ -189,7 +190,7 @@ export const addComment = async (req, res) => {
   }
 };
 
-export const getCommentForPost = async (req, res) => {
+export const getCommentOfPost = async (req, res) => {
   try {
     const postId = req.params.id;
 
@@ -210,6 +211,90 @@ export const getCommentForPost = async (req, res) => {
       success: true,
       comments,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const authorId = req.id;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        message: "post not found",
+        success: false,
+      });
+    }
+
+    // check if the logged in user is the author of the post
+
+    if (post.author.toString() !== authorId) {
+      return res.status(403).json({
+        message: "unauthorised user",
+        success: false,
+      });
+    }
+
+    // delete post
+
+    await Post.findByIdAndDelete(postId);
+
+    // remove the post id from user user model
+    let user = await User.findById(authorId);
+    user.posts = user.posts.filter((id) => id.toString() !== postId);
+
+    user.save();
+
+    // delete associated comments
+    await Comment.deleteMany({ post: postId });
+
+    return res.status(200).json({
+      message: "post deleted",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const savedPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const autherId = req.id;
+
+    const post = await Post.findById(postId);
+
+    if(!post){
+      return res.status(404).json({
+        message: 'post not found',
+        success: false
+      })
+    }
+
+    const user = await User.findById(autherId);
+
+    if(user.saved.includes(post._id)){
+      // if the post is already saved then remove is from the model
+      await user.updateOne({$pull:{saved: post._id}});
+      await user.save();
+      return res.status(200).json({
+        type: 'unsaved',
+        message: 'post removed from bookmark',
+        success: true
+      })
+    }else{
+      // if the post is not saved then save it to the user model
+      await user.updateOne({$addToSet:{saved: post._id}});
+      await user.save();
+      return res.status(200).json({
+        type: 'saved',
+        message: 'post added to saved',
+        success: true
+      })
+    }
   } catch (error) {
     console.log(error);
   }
