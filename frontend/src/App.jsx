@@ -1,15 +1,19 @@
 import React from 'react'
 import SideBar from './Componets/SideBar'
-import Componets2 from './Componets/Componets2'
-import Componets1 from './Componets/Compotnes1'
+import Postframe from './Componets/Postframe'
+import SearchPage from './Pages/SearchPage'
+import UserInfoWithButton from './Componets/UserInfoWithButton'
+import UserInfo from './Componets/UserInfo'
 
 
 const App = () => {
   return (
     <div>
       {/* <SideBar/> */}
-      {/* <Componets2/> */}
-      <Componets1/>
+      <UserInfoWithButton/>
+      {/* <UserInfo /> */}
+      {/* <Postframe/> */}
+      {/* <SearchPage/> */}
     </div>
   )
 }
