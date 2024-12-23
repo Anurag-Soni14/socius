@@ -7,9 +7,9 @@ import Componets1 from './Componets/Compotnes1'
 const App = () => {
   return (
     <div>
-      {/* <SideBar/> */}
-      {/* <Componets2/> */}
-      <Componets1/>
+      <SideBar/>
+      {/* <Componets2/>
+      <Componets1/> */}
     </div>
   )
 }

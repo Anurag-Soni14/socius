@@ -19,7 +19,7 @@ const SideBar = () => {
     return (
         <div>
             <button
-                className="sm:hidden fixed top-4 left-4 text-3xl"
+                className="sm:min-[768px]:hidden fixed top-4 left-4 text-3xl"
                 onClick={toggleSidebar}
             >
                 <GiHamburgerMenu />
