@@ -16,6 +16,7 @@ const SideBar = () => {
         setIsOpen(!isOpen);
     };
 
+
     return (
         <div>
             <button
