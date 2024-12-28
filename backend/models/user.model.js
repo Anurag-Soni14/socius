@@ -1,55 +1,62 @@
 import mongoose from "mongoose";
-const userSchema = new mongoose.Schema({
-    username:{
-        type:String, 
-        required: true, 
-        unique: true
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    email:{
-        type:String,
-        required: true,
-        unique: true
+    fullname: {
+      type: String,
+      required: true,
     },
-    password:{
-        type: String,
-        required: true
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    profilePic:{
-        type: String,
-        default: "",
+    password: {
+      type: String,
+      required: true,
     },
-    bio:{
-        type: String,
-        default: ""
+    profilePic: {
+      type: String,
+      default: "",
     },
-    gender:{
-        type: String,
-        enum: ['male','female']
+    bio: {
+      type: String,
+      default: "",
     },
-    followers:[
-        {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'User'
-        }
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
-    followings:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }
+    followings: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
-    posts:[
-        {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref:'Post'
-        }
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
     ],
-    saved:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref:'Post' 
-        }
-    ]
-},{timestamps: true});
+    saved: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-export const User = mongoose.model('User', userSchema);
+export const User = mongoose.model("User", userSchema);

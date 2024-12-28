@@ -7,9 +7,9 @@ import { Post } from "../models/post.model.js";
 
 export const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, fullname, email, password } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !fullname || !email || !password) {
       return res.status(401).json({
         message: "All fields are required",
         success: false,
@@ -29,6 +29,7 @@ export const register = async (req, res) => {
 
     await User.create({
       username,
+      fullname,
       email,
       password: hashedPass,
     });
@@ -84,6 +85,7 @@ export const login = async (req, res) => {
     user = {
       _id: user._id,
       username: user.username,
+      fullname: user.fullname,
       email: user.email,
       profilePic: user.profilePic,
       bio: user.bio,
