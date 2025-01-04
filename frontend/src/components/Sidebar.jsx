@@ -7,37 +7,29 @@ import {
   Search,
   TrendingUp,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const sidebarItems = [
-  { icon: <Home />, text: "Home" },
-  { icon: <Search />, text: "Search" },
-  { icon: <TrendingUp />, text: "Explore" },
-  { icon: <MessageCircle />, text: "Messages" },
-  { icon: <Heart />, text: "Notification" },
-  { icon: <PlusSquare />, text: "Create" },
-  {
-    icon: (
-      <Avatar className="size-6">
-        <AvatarImage src="https://github.com/shadcn.png" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
-    ),
-    text: "Profile",
-  },
-  { icon: <LogOut />, text: "Logout" },
-];
+import { useDispatch, useSelector } from "react-redux";
+import store from "@/redux/store";
+import { setAuthUser } from "@/redux/authSlice";
+import CreatePost from "@/Pages/CreatePost";
+
 function Sidebar() {
   const navigate = useNavigate();
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const [openDialogForCreate, setOpenDialogForCreate] = useState(false);
+
   const logoutHandler = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/v1/user/logout", {
         withCredentials: true,
       });
       if (res.data.success) {
+        dispatch(setAuthUser(null));
         navigate("/login");
         toast.success(res.data.message);
       } else {
@@ -47,9 +39,35 @@ function Sidebar() {
       toast.error(error.response.data.message);
     }
   };
+
+
   const sidebarHandler = (menu) => {
-    if (menu === "Logout") logoutHandler();
+    if (menu === "Logout") {
+      logoutHandler();
+    }else if(menu === "Create"){
+      setOpenDialogForCreate(true);
+    }
   };
+
+  const sidebarItems = [
+    { icon: <Home />, text: "Home" },
+    { icon: <Search />, text: "Search" },
+    { icon: <TrendingUp />, text: "Explore" },
+    { icon: <MessageCircle />, text: "Messages" },
+    { icon: <Heart />, text: "Notification" },
+    { icon: <PlusSquare />, text: "Create" },
+    {
+      icon: (
+        <Avatar className="size-6">
+          <AvatarImage src={user?.profilePic} />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      ),
+      text: "Profile",
+    },
+    { icon: <LogOut />, text: "Logout" },
+  ];
+
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
       <div className="flex flex-col ">
@@ -69,6 +87,7 @@ function Sidebar() {
           })}
         </div>
       </div>
+      <CreatePost openDialogForCreate={openDialogForCreate} setOpenDialogForCreate={setOpenDialogForCreate} />
     </div>
   );
 }

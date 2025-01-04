@@ -1,12 +1,14 @@
 import React from 'react'
 import Postframe from './Postframe'
+import { useSelector } from 'react-redux'
 
 function Posts() {
+  const {posts} = useSelector(store=>store.posts)
   return (
     <div className='size-96'>
-      {[1,2,3,4].map((item, index)=>{
+      {posts.map((post, )=>{
         return (
-            <Postframe key={index}/>
+            <Postframe key={post._id} post={post}/>
         )
       })}
     </div>

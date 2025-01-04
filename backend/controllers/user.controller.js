@@ -129,43 +129,60 @@ export const getProfile = async (req, res)=>{
   }
 }
 
-export const editProfile = async (req, res) =>{
+
+
+export const editProfile = async (req, res) => {
   try {
-    const userId = req.id;
-    const {bio, gender} = req.body;
-    const profilePic = req.file;
+    const userId = req.id; // Get authenticated user ID
+    const { bio, gender } = req.body; // Get fields from request body
+    const profilePic = req.file; // Get uploaded file
     let cloudResponse;
 
-    if(profilePic){
-      const fileUri = getDataUri(profilePic);
-      cloudResponse = await cloudinary.uploader.upload(fileUri);
+    // Handle profile picture upload if provided
+    if (profilePic) {
+      try {
+        const fileUri = getDataUri(profilePic); // Convert file to Data URI
+        cloudResponse = await cloudinary.uploader.upload(fileUri.content); // Upload to Cloudinary
+      } catch (err) {
+        return res.status(500).json({
+          message: "Failed to upload profile picture",
+          success: false,
+          error: err.message,
+        });
+      }
     }
 
-    const user = await User.findById(userId).select('-password');
-    if(!user){
+    // Find user in the database
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
       return res.status(404).json({
-        message: "user not found",
-        success: false
-      })
+        message: "User not found",
+        success: false,
+      });
     }
 
-    if(bio) user.bio = bio;
-    if(gender) user.gender = gender;
-    if(profilePic) user.profilePic = cloudResponse.secure_url;
+    // Update user fields
+    if (bio) user.bio = bio;
+    if (gender) user.gender = gender;
+    if (profilePic && cloudResponse) user.profilePic = cloudResponse.secure_url;
 
+    // Save changes
     await user.save();
 
-    return res.status(201).json({
-      message: "Profile updated",
+    return res.status(200).json({
+      message: "Profile updated successfully",
       success: true,
-      user
-    })
-
+      user,
+    });
   } catch (error) {
-    console.log(error)
+    console.error("Error in editProfile:", error); // Log the error for debugging
+    return res.status(500).json({
+      message: "Something went wrong while updating the profile",
+      success: false,
+      error: error.message,
+    });
   }
-}
-
+};
 
 export const suggestedUsers = async (req, res) =>{
   try {

@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { setAuthUser } from "@/redux/authSlice";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 function Login() {
@@ -15,6 +17,8 @@ function Login() {
     password: "",
   });
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const validateForm = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -34,6 +38,8 @@ function Login() {
         }
       );
       if (res.data.success) {
+        dispatch(setAuthUser(res.data.user));
+        navigate("/");
         toast.success(res.data.message);
         setFormData({
           email: "",

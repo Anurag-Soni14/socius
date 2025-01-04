@@ -1,7 +1,7 @@
-import DataUriParser from "datauri/parser.js";
+import DataURIParser from "datauri/parser.js";
 import path from "path"
 
-const parser = new DataUriParser();
+const parser = new DataURIParser();
 
 const getDataUri = (file) =>{
     const extName = path.extname(file.originalname).toString();

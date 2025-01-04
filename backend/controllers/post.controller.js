@@ -1,38 +1,36 @@
 import sharp from "sharp";
-import {Post} from "../models/post.model.js";
-import {User} from "../models/user.model.js";
+import { Post } from "../models/post.model.js";
+import { User } from "../models/user.model.js";
+import getDataUri from "../utils/data-uri.js";
 import {Comment} from "../models/comment.model.js";
 import cloudinary from "../utils/cloudinary.js";
+
+
 export const addNewPost = async (req, res) => {
   try {
     const { caption } = req.body;
     const image = req.file;
-    const autherId = req.id;
+    const authorId = req.id;
 
     if (!image) {
       return res.status(400).json({ message: "Please upload an image" });
     }
 
-    // image upload
-    const optimizedImageBuffer = await sharp(image.buffer)
-      .resize({ width: 800, height: 800, fit: "inside" })
-      .toFormat("jpeg", { quality: 80 })
-      .toBuffer();
+    // Convert image buffer to Data URI
+    const fileUri = getDataUri(image);
 
-    // buffer to uri
-    const fileUri = `data:image/jpeg;base64;${optimizedImageBuffer.toString(
-      "base64"
-    )}`;
+    // Upload to Cloudinary
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
-    const cloudResponse = await cloudinary.uploader.upload(fileUri);
+    // Save post to database
     const post = await Post.create({
       caption,
       image: cloudResponse.secure_url,
-      authorId: autherId,
+      author: authorId,
     });
 
-    const user = await User.findById(autherId);
-
+    // Link post to user
+    const user = await User.findById(authorId);
     if (user) {
       user.posts.push(post._id);
       await user.save();
@@ -45,7 +43,12 @@ export const addNewPost = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in addNewPost:", error);
+    return res.status(500).json({
+      message: "Something went wrong while creating the post.",
+      error: error.message,
+      success: false,
+    });
   }
 };
 
@@ -53,11 +56,11 @@ export const getAllPost = async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate({ path: "author", select: "username, profilePic" })
+      .populate({ path: "author", select: "username profilePic" })
       .populate({
         path: "comments",
         sort: { createdAt: -1 },
-        populate: { path: "author", select: "username, profilePic" },
+        populate: { path: "author", select: "username profilePic" },
       });
 
     return res.status(200).json({
