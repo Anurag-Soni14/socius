@@ -6,7 +6,7 @@ function Posts() {
   const {posts} = useSelector(store=>store.posts)
   return (
     <div className='size-96'>
-      {posts.map((post, )=>{
+      {posts.map((post)=>{
         return (
             <Postframe key={post._id} post={post}/>
         )

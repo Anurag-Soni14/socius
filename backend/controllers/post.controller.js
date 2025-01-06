@@ -1,8 +1,8 @@
 import sharp from "sharp";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
+import { Comment } from "../models/comment.model.js";
 import getDataUri from "../utils/data-uri.js";
-import {Comment} from "../models/comment.model.js";
 import cloudinary from "../utils/cloudinary.js";
 
 
@@ -100,6 +100,7 @@ export const likePost = async (req, res) => {
   try {
     const likedUser = req.id;
     const postId = req.params.id;
+
     const post = await Post.findById(postId);
 
     if (!post) {
@@ -109,27 +110,33 @@ export const likePost = async (req, res) => {
       });
     }
 
-    // like logic
+    await Post.updateOne(
+      { _id: postId }, 
+      { $addToSet: { likes: likedUser } } 
+    );
 
-    await Post.updateOne({ $addToSet: { likes: likedUser } });
+    // Implement socket.io for real-time notifications (if applicable)
 
-    await post.save();
-
-    // implement socket io for real time notification
-
-    return res.status(201).json({
-      message: "liked",
+    return res.status(200).json({
+      message: "Post liked",
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error liking post:", error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      success: false,
+      error: error.message,
+    });
   }
 };
+
 
 export const dislikePost = async (req, res) => {
   try {
     const userId = req.id;
     const postId = req.params.id;
+
     const post = await Post.findById(postId);
 
     if (!post) {
@@ -139,28 +146,33 @@ export const dislikePost = async (req, res) => {
       });
     }
 
-    // like logic
+    await Post.updateOne(
+      { _id: postId }, 
+      { $pull: { likes: userId } } 
+    );
 
-    await Post.updateOne({ $pull: { likes: userId } });
+    // Implement socket.io for real-time notifications (if applicable)
 
-    await post.save();
-
-    // implement socket io for real time notification
-
-    return res.status(201).json({
-      message: "unliked",
+    return res.status(200).json({
+      message: "Post unliked",
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error unliking post:", error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      success: false,
+      error: error.message,
+    });
   }
 };
+
 
 export const addComment = async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.id;
-    const text = req.body;
+    const {text} = req.body;
 
     const post = await Post.findById(postId);
 
@@ -175,9 +187,11 @@ export const addComment = async (req, res) => {
       text,
       author: userId,
       post: postId,
-    }).populate({
+    })
+
+    await comment.populate({
       path: "author",
-      select: "username, profilePic",
+      select: "username profilePic",
     });
 
     post.comments.push(comment._id);
@@ -185,7 +199,8 @@ export const addComment = async (req, res) => {
     await post.save();
 
     return res.status(201).json({
-      message: "comment added",
+      message: "Comment Added",
+      comment,
       success: true,
     });
   } catch (error) {
@@ -197,11 +212,7 @@ export const getCommentOfPost = async (req, res) => {
   try {
     const postId = req.params.id;
 
-    const comments = await Comment.find({ post: postId }).populate(
-      "author",
-      "username",
-      "profilePic"
-    );
+    const comments = await Comment.find({ post: postId }).populate( 'author', 'username', 'profilePic');
 
     if (!comments) {
       return res.status(404).json({
