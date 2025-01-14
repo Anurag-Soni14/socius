@@ -93,7 +93,7 @@ function Login() {
             isLoading? (
                 <Button>
                     {/* <Spinner /> */}
-                    <Loader2 className="mr-2 size-4 animate-spin"/> Please Wait
+                    <Loader2 className="mr-2 size-4 animate-spin"/> Please Wait...
                 </Button>
             ) : (
 

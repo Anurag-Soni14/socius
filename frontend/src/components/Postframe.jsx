@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -8,7 +8,9 @@ import CommentDialog from "./CommentDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios";
-import { setPosts } from "@/redux/postSlice";
+import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import { Badge } from "./ui/badge";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 function Postframe({ post }) {
   const captionRef = useRef(null);
@@ -22,8 +24,7 @@ function Postframe({ post }) {
   const [isTruncated, setIsTruncated] = useState(false);
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLike, setPostLike] = useState(post.likes.length);
-  const [comments, setComments] = useState(post.comments)
-  
+  const [comments, setComments] = useState(post.comments);
 
   useEffect(() => {
     if (captionRef.current) {
@@ -82,7 +83,7 @@ function Postframe({ post }) {
         setPostLike(updatedLikes);
         setLiked(!liked);
         //  update post
-        const updatedPostData = posts.map(p =>
+        const updatedPostData = posts.map((p) =>
           p._id === post._id
             ? {
                 ...p,
@@ -117,21 +118,21 @@ function Postframe({ post }) {
       );
 
       if (res.data.success) {
-        const updatedCommentData = [...comments, res.data.comment]
+        const updatedCommentData = [...comments, res.data.comment];
         setComments(updatedCommentData);
 
-        const updatedPostData = posts.map(p=>
-          p._id === post._id ? { ...p, comments:updatedCommentData } : p
-        )
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id ? { ...p, comments: updatedCommentData } : p
+        );
 
         dispatch(setPosts(updatedPostData));
-        setText('');
+        setText("");
         toast.success(res.data.message);
       }
     } catch (error) {
       console.log(error);
 
-      // toast.error(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -144,16 +145,24 @@ function Postframe({ post }) {
             <AvatarImage src={post.author?.profilePic} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <p className="ml-3 font-bold text-sm md:text-base">
-            {post.author?.username}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="ml-3 font-bold text-sm md:text-base">
+              {post.author?.username}
+            </p>
+            {user?._id === post?.author?._id && <Badge variant="secondary">Author</Badge>}
+          </div>
         </div>
         <div className="relative">
           <Dialog>
             <DialogTrigger asChild>
               <MoreHorizontal className="cursor-pointer" />
             </DialogTrigger>
+            
             <DialogContent className="flex flex-col items-center text-sm text-center">
+              <VisuallyHidden>
+                <DialogTitle>Buttons</DialogTitle>
+                <DialogDescription>post related buttons</DialogDescription>
+              </VisuallyHidden>
               <Button
                 variant="ghost"
                 className="cursor-pointer w-fit text-[#ed4956] font-bold"
@@ -232,8 +241,18 @@ function Postframe({ post }) {
       {/* Footer */}
       <div className="mt-3 text-sm text-gray-700">
         <p>
-          <span className="font-bold">{postLike}</span> likes |{" "}
-          <span className="font-bold">{comments.length}</span> comments
+          <span className="cursor-pointer">
+            <span className="font-bold">{postLike}</span> likes |{" "}
+          </span>
+          <span
+            className="cursor-pointer"
+            onClick={() => {
+              dispatch(setSelectedPost(post));
+              setShowCommentDialog(true);
+            }}
+          >
+            <span className="font-bold">{comments.length}</span> comments
+          </span>
         </p>
       </div>
 
@@ -253,7 +272,10 @@ function Postframe({ post }) {
         </button>
         <button
           className="text-gray-500 hover:text-gray-600 flex items-center gap-1"
-          onClick={() => setShowCommentDialog(true)}
+          onClick={() => {
+            dispatch(setSelectedPost(post));
+            setShowCommentDialog(true);
+          }}
         >
           <MessageCircle /> Comments
         </button>
@@ -273,7 +295,14 @@ function Postframe({ post }) {
           placeholder="Write a comment..."
           className="w-full p-2 outline-none border border-gray-300 rounded-lg text-sm m-2"
         />
-        {text && <span className="text-[#38adf8] text-sm cursor-pointer" onClick={commentHandler}>Post</span>}
+        {text && (
+          <span
+            className="text-[#38adf8] text-sm cursor-pointer"
+            onClick={commentHandler}
+          >
+            Post
+          </span>
+        )}
       </div>
     </div>
   );

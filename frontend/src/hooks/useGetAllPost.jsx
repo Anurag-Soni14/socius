@@ -1,8 +1,6 @@
-// const { useEffect } = require("react");
-// const { useDispatch } = require("react-redux");
 import { setPosts } from "@/redux/postSlice";
 import axios from "axios";
-import React,{useEffect} from 'react';
+import {useEffect} from 'react';
 import { useDispatch } from "react-redux";
 
 
