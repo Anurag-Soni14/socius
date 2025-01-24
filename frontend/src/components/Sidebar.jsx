@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import store from "@/redux/store";
 import { setAuthUser } from "@/redux/authSlice";
 import CreatePost from "@/Pages/CreatePost";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
@@ -51,6 +50,8 @@ function Sidebar() {
       setOpenDialogForCreate(true);
     }else if(menu === "Profile"){
       navigate(`/profile/${user?._id}`)
+    }else if(menu === "Home"){
+      navigate('/');
     }
   };
 

@@ -18,7 +18,7 @@ const useGetUserProfile = (userId) => {
             }
         }
         fetchUserProfile();
-    },[])
+    },[userId])
 
 };
 

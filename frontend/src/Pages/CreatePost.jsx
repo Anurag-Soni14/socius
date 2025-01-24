@@ -5,12 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { readFileAsDataURL } from "@/lib/utils";
 import { setPosts } from "@/redux/postSlice";
 import store from "@/redux/store";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-
 
 function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
   const imageRef = useRef();
@@ -18,9 +19,9 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
   const [caption, setCaption] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(false);
-  const {user} = useSelector(store=>store.auth)
+  const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
-  const { posts } = useSelector(store=>store.posts)
+  const { posts } = useSelector((store) => store.posts);
 
   const fileChangeHandler = async (e) => {
     const file = e.target.files?.[0];
@@ -50,19 +51,23 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
       if (res.data.success) {
         dispatch(setPosts([res.data.post, ...posts]));
         toast.success(res.data.message);
-        setOpenDialogForCreate(false)
+        setOpenDialogForCreate(false);
       } else {
         toast.info(res.data.message);
       }
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
   return (
     <Dialog open={openDialogForCreate}>
       <DialogContent onInteractOutside={() => setOpenDialogForCreate(false)}>
+        <VisuallyHidden>
+          <DialogTitle>Buttons</DialogTitle>
+          <DialogDescription>a dialog to create the posts</DialogDescription>
+        </VisuallyHidden>
         <DialogHeader className="text-center font-semibold">
           Create New Post
         </DialogHeader>

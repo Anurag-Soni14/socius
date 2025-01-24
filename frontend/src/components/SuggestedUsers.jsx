@@ -3,7 +3,7 @@ import UserInfoWithButton from "./UserInfoWithButton";
 import { useSelector } from "react-redux";
 
 function SuggestedUsers() {
-  const { suggestedUsers } = useSelector((store) => store.auth);
+  const { suggestedUsers } = useSelector(store => store.auth);
 
   return (
     <div className="my-10">
@@ -15,9 +15,7 @@ function SuggestedUsers() {
         suggestedUsers.map((user) => (
           <UserInfoWithButton
             key={user?._id}
-            profilePic={user?.profilePic}
-            username={user?.username}
-            fullname={user?.fullname}
+            user={user}
           />
         ))
       ) : (
