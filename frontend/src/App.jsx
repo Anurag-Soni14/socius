@@ -10,6 +10,8 @@ import Login from './Pages/Login'
 import MainLayout from './Pages/MainLayout'
 import Home from './Pages/Home'
 import Profile from './Pages/Profile'
+import EditProfile from './Pages/EditProfile'
+import Setting from './Pages/Setting'
 
 
 const browserRouter = createBrowserRouter([
@@ -24,7 +26,19 @@ const browserRouter = createBrowserRouter([
       {
         path: '/profile/:id',
         element:<Profile/>
-      }
+      },
+      {
+        path: '/account/edit',
+        element:<EditProfile/>
+      },
+      {
+        path: '/account/settings',
+        element:<Setting/>
+      },
+      {
+        path: '/account/settings/edit-profile',
+        element:<EditProfile/>
+      },
     ]
   },
   {

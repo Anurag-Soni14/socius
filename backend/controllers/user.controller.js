@@ -138,7 +138,7 @@ export const getProfile = async (req, res)=>{
 export const editProfile = async (req, res) => {
   try {
     const userId = req.id; // Get authenticated user ID
-    const { bio, gender } = req.body; // Get fields from request body
+    const { username, fullname, email, bio, gender } = req.body; // Get fields from request body
     const profilePic = req.file; // Get uploaded file
     let cloudResponse;
 
@@ -166,6 +166,9 @@ export const editProfile = async (req, res) => {
     }
 
     // Update user fields
+    if (username) user.username = username;
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
     if (bio) user.bio = bio;
     if (gender) user.gender = gender;
     if (profilePic && cloudResponse) user.profilePic = cloudResponse.secure_url;

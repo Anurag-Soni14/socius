@@ -12,25 +12,31 @@ const Profile = () => {
   const navigate = useNavigate();
   const userId = params.id;
   useGetUserProfile(userId);
-  const { userProfile } = useSelector((store) => store.auth);
+  const { userProfile, user } = useSelector((store) => store.auth);
   const [activeTab, setActiveTab] = useState("posts");
 
-  // const handleSettingsClick = () => {
-  //   navigate("/settings");
-  // };
+  const isLoggedInUserProfile = user?._id === userProfile?._id;
+
+  const handleSettingsClick = () => {
+    navigate("/account/settings");
+  };
 
   const displayPosts =
     activeTab === "posts" ? userProfile?.posts : userProfile?.saved;
 
   return (
     <div className="p-4 max-w-5xl mx-auto relative">
-      <button
-        // onClick={handleSettingsClick}
-        className="absolute top-4 right-4 focus:outline-none"
-        aria-label="Settings"
-      >
-        <Cog6ToothIcon className="w-6 h-6 text-gray-700 hover:text-gray-900" />
-      </button>
+      {isLoggedInUserProfile ? (
+        <button
+          onClick={handleSettingsClick}
+          className="absolute top-4 right-4 focus:outline-none"
+          aria-label="Settings"
+        >
+          <Cog6ToothIcon className="w-6 h-6 text-gray-700 hover:text-gray-900" />
+        </button>
+      ) : (
+        <></>
+      )}
 
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-6">
         <Avatar className="size-24">
@@ -93,12 +99,14 @@ const Profile = () => {
             <div className="absolute rounded-md inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="flex items-center text-white space-x-4">
                 <button className="flex items-center gap-2 hover:text-gray-300">
-                  <FaRegHeart className="size-[22px]"/><span>{post?.likes.length}</span>
+                  <FaRegHeart className="size-[22px]" />
+                  <span>{post?.likes?.length}</span>
                 </button>
                 <button className="flex items-center gap-2 hover:text-gray-300">
-                  <MessageCircle className="size-[22px]"/><span>{post?.comments.length}</span>
+                  <MessageCircle className="size-[22px]" />
+                  <span>{post?.comments?.length}</span>
                 </button>
-              </div>  
+              </div>
             </div>
           </div>
         ))}
