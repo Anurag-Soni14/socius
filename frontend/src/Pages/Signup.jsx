@@ -52,71 +52,70 @@ function Signup() {
   };
 
   return (
-    <div className="flex items-center w-screen h-screen justify-center">
+    <div className="flex items-center w-screen h-screen justify-center bg-base-100">
       <form
-        className="shadow-lg flex flex-col gap-5 p-8"
+        className="shadow-lg flex flex-col gap-5 p-8 bg-base-200 rounded-lg"
         onSubmit={handleSubmit}
       >
         <div className="my-4">
-          <h1 className="text-center font-bold text-xl">LOGO</h1>
-          <p className="text-center text-sm">
+          <h1 className="text-center font-bold text-xl text-primary">LOGO</h1>
+          <p className="text-center text-sm text-base-content">
             Signup now to explore the world of socius
           </p>
         </div>
         <div>
-          <Label className="ml-3">Username</Label>
+          <Label className="ml-3 text-base-content">Username</Label>
           <Input
             type="text"
             name="username"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.username}
             onChange={validateForm}
           />
         </div>
         <div>
-          <Label className="ml-3">Full Name</Label>
+          <Label className="ml-3 text-base-content">Full Name</Label>
           <Input
             type="text"
             name="fullname"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.fullname}
             onChange={validateForm}
           />
         </div>
         <div>
-          <Label className="ml-3">E-mail</Label>
+          <Label className="ml-3 text-base-content">E-mail</Label>
           <Input
             type="email"
             name="email"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.email}
             onChange={validateForm}
           />
         </div>
         <div>
-          <Label className="ml-3">Password</Label>
+          <Label className="ml-3 text-base-content">Password</Label>
           <Input
             type="password"
             name="password"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.password}
             onChange={validateForm}
           />
         </div>
-        {
-            isLoading? (
-                <Button>
-                    {/* <Spinner /> */}
-                    <Loader2 className="mr-2 size-4 animate-spin"/> Please Wait...
-                </Button>
-            ) : (
-
-                <Button>Create Account</Button>
-            )
-        }
-        <span className="text-center">
+        {isLoading ? (
+          <Button className="bg-primary text-white hover:bg-primary-focus w-full">
+            <Loader2 className="mr-2 size-4 animate-spin" />
+            Please Wait...
+          </Button>
+        ) : (
+          <Button className="bg-primary text-white hover:bg-primary-focus w-full">
+            Create Account
+          </Button>
+        )}
+        <span className="text-center text-base-content">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-500">
+          <Link to="/login" className="text-primary">
             Login
           </Link>
         </span>

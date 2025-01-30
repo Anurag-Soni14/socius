@@ -1,24 +1,56 @@
-import daisyui from 'daisyui'
+import daisyui from "daisyui";
 
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: ["class"],
-    content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  extends: {
-   
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {},
   },
   plugins: [daisyui, require("tailwindcss-animate")],
-    theme: {
-    	extend: {
-    		borderRadius: {
-    			lg: 'var(--radius)',
-    			md: 'calc(var(--radius) - 2px)',
-    			sm: 'calc(var(--radius) - 4px)'
-    		},
-    		colors: {}
-    	}
-    }
-}
+  daisyui: {
+    themes: [
+      "light",
+      "dark",
+      "cupcake",
+      "bumblebee",
+      "emerald",
+      "corporate",
+      "synthwave",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "halloween",
+      "garden",
+      "forest",
+      "aqua",
+      "lofi",
+      "pastel",
+      "fantasy",
+      "wireframe",
+      "black",
+      "luxury",
+      "dracula",
+      "cmyk",
+      "autumn",
+      "business",
+      "acid",
+      "lemonade",
+      "night",
+      "coffee",
+      "winter",
+      "dim",
+      "nord",
+      "sunset",
+    ],
+  },
+  // theme: {
+  // 	extend: {
+  // 		borderRadius: {
+  // 			lg: 'var(--radius)',
+  // 			md: 'calc(var(--radius) - 2px)',
+  // 			sm: 'calc(var(--radius) - 4px)'
+  // 		},
+  // 		colors: {}
+  // 	}
+  // }
+};

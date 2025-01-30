@@ -8,8 +8,8 @@ function SuggestedUsers() {
   return (
     <div className="my-10">
       <div className="flex items-center justify-between text-sm">
-        <h1 className="font-semibold text-gray-600">Suggested for you</h1>
-        <span>See all</span>
+        <h1 className="font-semibold text-base-content">Suggested for you</h1>
+        <span className="text-primary hover:text-primary-focus cursor-pointer">See all</span>
       </div>
       {suggestedUsers && suggestedUsers.length > 0 ? (
         suggestedUsers.map((user) => (

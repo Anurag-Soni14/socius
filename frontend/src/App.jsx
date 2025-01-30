@@ -1,63 +1,44 @@
-import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-// import SideBar from './components/SideBar'
-// import Postframe from './components/Postframe'
-// import SearchPage from './Pages/SearchPage'
-// import UserInfoWithButton from './components/UserInfoWithButton'
-// import UserInfo from './components/UserInfo'
-import Signup from './Pages/Signup'
-import Login from './Pages/Login'
-import MainLayout from './Pages/MainLayout'
-import Home from './Pages/Home'
-import Profile from './Pages/Profile'
-import EditProfile from './Pages/EditProfile'
-import Setting from './Pages/Setting'
-
+import React, { useEffect } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useThemeStore } from "./hooks/useThemeStore";
+import MainLayout from "./Pages/MainLayout";
+import Home from "./Pages/Home";
+import Profile from "./Pages/Profile";
+import EditProfile from "./Pages/EditProfile";
+import Setting from "./Pages/Setting";
+import ChangeTheme from "./Pages/ChangeTheme";
+import Signup from "./Pages/Signup";
+import Login from "./Pages/Login";
 
 const browserRouter = createBrowserRouter([
   {
-    path:'/',
-    element:<MainLayout/>,
+    path: "/",
+    element: <MainLayout />,
     children: [
-      {
-        path: '/',
-        element:<Home/>
-      },
-      {
-        path: '/profile/:id',
-        element:<Profile/>
-      },
-      {
-        path: '/account/edit',
-        element:<EditProfile/>
-      },
-      {
-        path: '/account/settings',
-        element:<Setting/>
-      },
-      {
-        path: '/account/settings/edit-profile',
-        element:<EditProfile/>
-      },
-    ]
+      { path: "/", element: <Home /> },
+      { path: "/profile/:id", element: <Profile /> },
+      { path: "/account/settings", element: <Setting /> },
+      { path: "/account/settings/edit-profile", element: <EditProfile /> },
+      { path: "/account/settings/change-theme", element: <ChangeTheme /> },
+    ],
   },
-  {
-    path:'/login',
-    element:<Login/>
-  },
-  {
-    path:'/signup',
-    element:<Signup/>
-  }
-
-])
+  { path: "/login", element: <Login /> },
+  { path: "/signup", element: <Signup /> },
+]);
 
 const App = () => {
-  return (
-    <>
-      <RouterProvider  router={browserRouter} />
-    </>
-  )
-}
+  const { theme } = useThemeStore();
 
-export default App
+  useEffect(() => {
+    // Apply the theme globally to the <html> tag
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]); // Re-run when theme changes
+
+  return (
+    <div className="h-full min-h-screen">
+      <RouterProvider router={browserRouter} />
+    </div>
+  );
+};
+
+export default App;

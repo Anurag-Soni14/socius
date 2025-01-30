@@ -31,6 +31,7 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
       setImagePreview(dataUrl);
     }
   };
+  
   const createPostHandler = async (e) => {
     const formData = new FormData();
     formData.append("caption", caption);
@@ -61,14 +62,15 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
       setLoading(false);
     }
   };
+
   return (
     <Dialog open={openDialogForCreate}>
-      <DialogContent onInteractOutside={() => setOpenDialogForCreate(false)}>
+      <DialogContent onInteractOutside={() => setOpenDialogForCreate(false)} className="bg-base-100 text-base-content">
         <VisuallyHidden>
           <DialogTitle>Buttons</DialogTitle>
           <DialogDescription>a dialog to create the posts</DialogDescription>
         </VisuallyHidden>
-        <DialogHeader className="text-center font-semibold">
+        <DialogHeader className="text-center font-semibold text-base-content">
           Create New Post
         </DialogHeader>
         <div className="flex gap-3 items-center">
@@ -77,12 +79,12 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="font-semibold text-xs">{user?.username}</h1>
+            <h1 className="font-semibold text-xs text-base-content">{user?.username}</h1>
             <span className="text-gray-600 text-xs">bio...</span>
           </div>
         </div>
         <Textarea
-          className="focus-visible:ring-transparent border-none"
+          className="focus-visible:ring-transparent border-none bg-base-200 text-base-content"
           placeholder="Write a caption..."
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
@@ -106,20 +108,20 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
         />
         <Button
           onClick={() => imageRef.current.click()}
-          className="w-fit mx-auto bg-[#0095f6] hover:bg-[#258bcf]"
+          className="w-fit mx-auto bg-primary text-base-100 hover:bg-primary-focus"
         >
           Select from computer
         </Button>
 
         {imagePreview &&
           (loading ? (
-            <Button>
+            <Button className="bg-primary text-base-100">
               <Loader2 className="mr-2 size-4 animate-spin" /> Please Wait...
             </Button>
           ) : (
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-primary text-base-100 hover:bg-primary-focus"
               onClick={createPostHandler}
             >
               Post

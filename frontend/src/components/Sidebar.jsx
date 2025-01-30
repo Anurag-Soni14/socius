@@ -30,8 +30,8 @@ function Sidebar() {
       });
       if (res.data.success) {
         dispatch(setAuthUser(null));
-        dispatch(setSelectedPost(null))
-        dispatch(setPosts([]))
+        dispatch(setSelectedPost(null));
+        dispatch(setPosts([]));
         navigate("/login");
         toast.success(res.data.message);
       } else {
@@ -42,16 +42,15 @@ function Sidebar() {
     }
   };
 
-
   const sidebarHandler = (menu) => {
     if (menu === "Logout") {
       logoutHandler();
-    }else if(menu === "Create"){
+    } else if (menu === "Create") {
       setOpenDialogForCreate(true);
-    }else if(menu === "Profile"){
-      navigate(`/profile/${user?._id}`)
-    }else if(menu === "Home"){
-      navigate('/');
+    } else if (menu === "Profile") {
+      navigate(`/profile/${user?._id}`);
+    } else if (menu === "Home") {
+      navigate("/");
     }
   };
 
@@ -75,22 +74,20 @@ function Sidebar() {
   ];
 
   return (
-    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
-      <div className="flex flex-col ">
-        <h1 className="my-8 pl-3 font-bold text-xl">Logo</h1>
-        <div>
-          {sidebarItems.map((ListItem, index) => {
-            return (
-              <div
-                key={index}
-                className="cursor-pointer flex items-center gap-3 relative hover:bg-gray-100 rounded-lg p-3 my-3"
-                onClick={() => sidebarHandler(ListItem.text)}
-              >
-                {ListItem.icon}
-                <span>{ListItem.text}</span>
-              </div>
-            );
-          })}
+    <div className="fixed top-0 left-0 z-10 w-[16%] h-screen border-r border-base-300 bg-base-100 text-base-content px-4">
+      <div className="flex flex-col h-full">
+        <h1 className="my-8 pl-3 font-bold text-xl text-base-content">Logo</h1>
+        <div className="flex-grow">
+          {sidebarItems.map((ListItem, index) => (
+            <div
+              key={index}
+              className="cursor-pointer flex items-center gap-3 relative hover:bg-base-200 rounded-lg p-3 my-3"
+              onClick={() => sidebarHandler(ListItem.text)}
+            >
+              <span className={`text-base-content hover:text-primary`}>{ListItem.icon}</span>
+              <span className="text-base-content">{ListItem.text}</span>
+            </div>
+          ))}
         </div>
       </div>
       <CreatePost openDialogForCreate={openDialogForCreate} setOpenDialogForCreate={setOpenDialogForCreate} />

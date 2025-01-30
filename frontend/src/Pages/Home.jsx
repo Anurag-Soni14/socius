@@ -1,22 +1,23 @@
-import Feed from '@/components/Feed'
-import UserSuggestion from '@/components/UserSuggestion'
-import useGetAllPost from '@/hooks/useGetAllPost'
-import useGetSuggestedUsers from '@/hooks/useGetSuggestedUsers'
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import Feed from '@/components/Feed';
+import UserSuggestion from '@/components/UserSuggestion';
+import useGetAllPost from '@/hooks/useGetAllPost';
+import useGetSuggestedUsers from '@/hooks/useGetSuggestedUsers';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 
 function Home() {
   useGetAllPost();
   useGetSuggestedUsers();
+
   return (
-    <div className='flex'>
-      <div className='flex-grow'>
-        <Feed/>
-        <Outlet/>
+    <div className="flex bg-base-100 text-base-content">
+      <div className="flex-grow">
+        <Feed />
+        <Outlet />
       </div>
-      <UserSuggestion/>
+      <UserSuggestion />
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

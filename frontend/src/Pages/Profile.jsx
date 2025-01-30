@@ -25,18 +25,16 @@ const Profile = () => {
     activeTab === "posts" ? userProfile?.posts : userProfile?.saved;
 
   return (
-    <div className="p-4 max-w-5xl mx-auto relative">
+    <div className="p-4 max-w-5xl mx-auto relative bg-base-100">
       {isLoggedInUserProfile ? (
         <button
           onClick={handleSettingsClick}
           className="absolute top-4 right-4 focus:outline-none"
           aria-label="Settings"
         >
-          <Cog6ToothIcon className="w-6 h-6 text-gray-700 hover:text-gray-900" />
+          <Cog6ToothIcon className="w-6 h-6 text-base-content hover:text-primary" />
         </button>
-      ) : (
-        <></>
-      )}
+      ) : null}
 
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-6">
         <Avatar className="size-24">
@@ -45,16 +43,16 @@ const Profile = () => {
         </Avatar>
 
         <div className="text-center sm:text-left mt-4 sm:mt-0">
-          <h1 className="text-lg font-semibold">{userProfile?.username}</h1>
-          <h2 className="text-gray-600">{userProfile?.fullname}</h2>
+          <h1 className="text-lg font-semibold text-primary">{userProfile?.username}</h1>
+          <h2 className="text-base-content">{userProfile?.fullname}</h2>
         </div>
       </div>
 
       <div className="mt-4 text-center sm:text-left">
-        <p className="text-gray-500">{userProfile?.bio}</p>
+        <p className="text-base-content">{userProfile?.bio}</p>
       </div>
 
-      <div className="flex justify-center sm:justify-start gap-8 mt-4 text-sm text-gray-700">
+      <div className="flex justify-center sm:justify-start gap-8 mt-4 text-sm text-base-content">
         <div>
           <span className="font-bold">{userProfile?.followers.length}</span>{" "}
           Followers
@@ -69,8 +67,8 @@ const Profile = () => {
         <button
           className={`pb-2 ${
             activeTab === "posts"
-              ? "font-bold border-b-2 border-black"
-              : "text-gray-600"
+              ? "font-bold border-b-2 border-primary"
+              : "text-base-content"
           }`}
           onClick={() => setActiveTab("posts")}
         >
@@ -79,8 +77,8 @@ const Profile = () => {
         <button
           className={`pb-2 ${
             activeTab === "saved"
-              ? "font-bold border-b-2 border-black"
-              : "text-gray-600"
+              ? "font-bold border-b-2 border-primary"
+              : "text-base-content"
           }`}
           onClick={() => setActiveTab("saved")}
         >

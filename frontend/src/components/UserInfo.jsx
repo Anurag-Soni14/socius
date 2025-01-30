@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 const UserInfo = () => {
   const { user } = useSelector((store) => store.auth);
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 p-3 hover:bg-base-200 rounded-md">
         <Link to={`/profile/${user?._id}`}>
           <Avatar className="size-10">
             <AvatarImage src={user?.profilePic} />
@@ -15,7 +15,7 @@ const UserInfo = () => {
         </Link>
 
         <div className="flex items-center gap-3">
-          <p className="ml-3 font-bold text-sm md:text-base flex flex-col">
+          <p className="ml-3 font-bold text-sm md:text-base flex flex-col text-base-content">
             <Link to={`/profile/${user?._id}`}>{user?.username}</Link>
             <span className="font-normal text-sm">{user?.fullname}</span>
           </p>

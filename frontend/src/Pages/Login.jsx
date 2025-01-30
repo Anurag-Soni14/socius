@@ -45,12 +45,11 @@ function Login() {
           email: "",
           password: "",
         });
-      }else{
+      } else {
         toast.error(res.data.message);
       }
-
     } catch (error) {
-        console.log(error)
+      console.log(error);
       toast.error(error.response.data.message);
     } finally {
       setLoding(false);
@@ -58,51 +57,50 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center w-screen h-screen justify-center">
+    <div className="flex items-center w-screen h-screen justify-center bg-base-100">
       <form
-        className="shadow-lg flex flex-col gap-5 p-8"
+        className="shadow-lg flex flex-col gap-5 p-8 bg-base-200 rounded-lg"
         onSubmit={handleSubmit}
       >
         <div className="my-4">
-          <h1 className="text-center font-bold text-xl">LOGO</h1>
-          <p className="text-center text-sm">
+          <h1 className="text-center font-bold text-xl text-primary">LOGO</h1>
+          <p className="text-center text-sm text-base-content">
             Login now to explore the world of socius
           </p>
         </div>
         <div>
-          <Label className="ml-3">E-mail</Label>
+          <Label className="ml-3 text-base-content">E-mail</Label>
           <Input
             type="email"
             name="email"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.email}
             onChange={validateForm}
           />
         </div>
         <div>
-          <Label className="ml-3">Password</Label>
+          <Label className="ml-3 text-base-content">Password</Label>
           <Input
             type="password"
             name="password"
-            className="focus-visible:ring-transparent my-2"
+            className="focus-visible:ring-primary my-2 bg-base-100 text-base-content"
             value={formData.password}
             onChange={validateForm}
           />
         </div>
-        {
-            isLoading? (
-                <Button>
-                    {/* <Spinner /> */}
-                    <Loader2 className="mr-2 size-4 animate-spin"/> Please Wait...
-                </Button>
-            ) : (
-
-                <Button>Login</Button>
-            )
-        }
-        <span className="text-center">
+        {isLoading ? (
+          <Button className="bg-primary text-white hover:bg-primary-focus w-full">
+            <Loader2 className="mr-2 size-4 animate-spin" />
+            Please Wait...
+          </Button>
+        ) : (
+          <Button className="bg-primary text-white hover:bg-primary-focus w-full">
+            Login
+          </Button>
+        )}
+        <span className="text-center text-base-content">
           Doesn't have an account?{" "}
-          <Link to="/signup" className="text-blue-500">
+          <Link to="/signup" className="text-primary">
             Sign up
           </Link>
         </span>

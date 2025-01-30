@@ -31,22 +31,16 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
 
   const commentHandler = (e) => {
     const inputText = e.target.value;
-    if (inputText.trim()) {
-      setText(inputText);
-    } else {
-      setText("");
-    }
+    setText(inputText.trim() ? inputText : "");
   };
 
-  const postCommentHandler = async (e) => {
+  const postCommentHandler = async () => {
     try {
       const res = await axios.post(
         `http://localhost:5000/api/v1/post/${selectedPost._id}/comment`,
         { text },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
@@ -56,9 +50,7 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
         setComments(updatedCommentData);
 
         const updatedPostData = posts.map((p) =>
-          p._id === selectedPost._id
-            ? { ...p, comments: updatedCommentData }
-            : p
+          p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
         );
 
         dispatch(setPosts(updatedPostData));
@@ -66,16 +58,15 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
-
-      // toast.error(error.response.data.message);
+      console.error(error);
     }
   };
+
   return (
     <Dialog open={showCommentDialog}>
       <DialogContent
         onInteractOutside={() => setShowCommentDialog(false)}
-        className="max-w-5xl p-0 flex flex-col"
+        className="max-w-5xl p-0 flex flex-col bg-base-100 text-base-content"
       >
         <VisuallyHidden>
           <DialogTitle>Comments</DialogTitle>
@@ -93,52 +84,47 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
             <div className="flex items-center justify-between p-4">
               <div className="flex gap-3 items-center">
                 <Link>
-                  <Avatar className="size-10 ">
+                  <Avatar className="size-10">
                     <AvatarImage src={selectedPost?.author?.profilePic} />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div>
-                  <Link className="font-semibold text-xs">
+                  <Link className="font-semibold text-xs text-base-content">
                     {selectedPost?.author?.username}
                   </Link>
-                  {/* <span className="text-gray-600 text-sm ">Bio here...</span> */}
                 </div>
               </div>
-
               <Dialog>
-                <DialogTrigger asChild className="cursor-pointer">
-                  <MoreHorizontal />
+                <DialogTrigger asChild>
+                  <MoreHorizontal className="cursor-pointer text-base-content" />
                 </DialogTrigger>
-                <DialogContent className="flex flex-col items-center text-sm text-center">
-                  <button className="cursor-pointer w-full text-[#ed4956]">
-                    Unfollow
-                  </button>
-                  <button className="cursor-pointer w-full">
-                    Add to favorite
-                  </button>
+                <DialogContent className="flex flex-col items-center text-sm text-center bg-base-200 text-base-content">
+                  <button className="cursor-pointer w-full text-error">Unfollow</button>
+                  <button className="cursor-pointer w-full">Add to favorite</button>
                 </DialogContent>
               </Dialog>
             </div>
-            <hr />
+            <hr className="border-base-300" />
             <div className="flex-1 overflow-y-auto max-h-96 p-4">
               {comments.map((comment) => (
                 <Comment key={comment._id} comment={comment} />
               ))}
             </div>
-            <div className="p-4 ">
+            <div className="p-4">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={text}
                   placeholder="Add a comment..."
                   onChange={commentHandler}
-                  className="w-full p-2 outline-none border border-gray-300 rounded-lg text-sm"
+                  className="w-full p-2 outline-none border border-base-300 bg-base-200 text-base-content rounded-lg text-sm"
                 />
                 <Button
                   variant="outline"
                   onClick={postCommentHandler}
                   disabled={!text.trim()}
+                  className="text-base-content border-base-300"
                 >
                   Post
                 </Button>
