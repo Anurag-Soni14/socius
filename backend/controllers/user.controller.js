@@ -94,8 +94,9 @@ export const login = async (req, res) => {
       profilePic: user.profilePic,
       bio: user.bio,
       followers: user.followers,
-      folliwing: user.followings,
-      posts: user.posts
+      followings: user.followings,
+      posts: user.posts,
+      saved: user.saved
     }
 
     return res.cookie('token', token, {httpOnly: true, sameSite: 'strict', maxAge: 7*24*60*60*1000}).json({
@@ -135,18 +136,101 @@ export const getProfile = async (req, res)=>{
 
 
 
+// export const editProfile = async (req, res) => {
+//   try {
+//     const userId = req.id; // Get authenticated user ID
+//     const { username, fullname, email, bio, gender } = req.body; // Get fields from request body
+//     const profilePic = req.file; // Get uploaded file
+//     let cloudResponse;
+
+//     // Handle profile picture upload if provided
+//     if (profilePic) {
+//       try {
+//         const fileUri = getDataUri(profilePic); // Convert file to Data URI
+//         cloudResponse = await cloudinary.uploader.upload(fileUri.content); // Upload to Cloudinary
+//       } catch (err) {
+//         return res.status(500).json({
+//           message: "Failed to upload profile picture",
+//           success: false,
+//           error: err.message,
+//         });
+//       }
+//     }
+
+//     // Find user in the database
+//     const user = await User.findById(userId).select("-password");
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//         success: false,
+//       });
+//     }
+
+//     // Update user fields
+//     if (username) user.username = username;
+//     if (fullname) user.fullname = fullname;
+//     if (email) user.email = email;
+//     if (bio) user.bio = bio;
+//     if (gender) user.gender = gender;
+//     if (profilePic && cloudResponse) user.profilePic = cloudResponse.secure_url;
+
+//     // Save changes
+//     await user.save();
+
+//     return res.status(200).json({
+//       message: "Profile updated successfully",
+//       success: true,
+//       user,
+//     });
+//   } catch (error) {
+//     console.error("Error in editProfile:", error); // Log the error for debugging
+//     return res.status(500).json({
+//       message: "Something went wrong while updating the profile",
+//       success: false,
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const editProfile = async (req, res) => {
   try {
-    const userId = req.id; // Get authenticated user ID
-    const { username, fullname, email, bio, gender } = req.body; // Get fields from request body
-    const profilePic = req.file; // Get uploaded file
+    const userId = req.id; 
+    const { username, fullname, email, bio, gender } = req.body; 
+    const profilePic = req.file; 
     let cloudResponse;
 
-    // Handle profile picture upload if provided
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+      if (existingUser) {
+        return res.status(400).json({
+          message: "Username is already taken. Please choose another one.",
+          success: false,
+        });
+      }
+    }
+
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
+      if (existingEmail) {
+        return res.status(400).json({
+          message: "Email is already in use. Please use a different email.",
+          success: false,
+        });
+      }
+    }
+
     if (profilePic) {
       try {
-        const fileUri = getDataUri(profilePic); // Convert file to Data URI
-        cloudResponse = await cloudinary.uploader.upload(fileUri.content); // Upload to Cloudinary
+        const fileUri = getDataUri(profilePic); 
+        cloudResponse = await cloudinary.uploader.upload(fileUri.content); 
       } catch (err) {
         return res.status(500).json({
           message: "Failed to upload profile picture",
@@ -156,24 +240,23 @@ export const editProfile = async (req, res) => {
       }
     }
 
-    // Find user in the database
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
+    const updatedFields = {};
+    if (username && username !== user.username) updatedFields.username = username;
+    if (fullname && fullname !== user.fullname) updatedFields.fullname = fullname;
+    if (email && email !== user.email) updatedFields.email = email;
+    if (bio && bio !== user.bio) updatedFields.bio = bio;
+    if (gender && gender !== user.gender) updatedFields.gender = gender;
+    if (profilePic && cloudResponse) updatedFields.profilePic = cloudResponse.secure_url;
+
+    if (Object.keys(updatedFields).length === 0) {
+      return res.status(200).json({
+        message: "No changes detected in profile.",
+        success: true,
+        user,
       });
     }
 
-    // Update user fields
-    if (username) user.username = username;
-    if (fullname) user.fullname = fullname;
-    if (email) user.email = email;
-    if (bio) user.bio = bio;
-    if (gender) user.gender = gender;
-    if (profilePic && cloudResponse) user.profilePic = cloudResponse.secure_url;
-
-    // Save changes
+    Object.assign(user, updatedFields);
     await user.save();
 
     return res.status(200).json({
@@ -182,7 +265,7 @@ export const editProfile = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Error in editProfile:", error); // Log the error for debugging
+    console.error("Error in editProfile:", error);
     return res.status(500).json({
       message: "Something went wrong while updating the profile",
       success: false,
@@ -190,6 +273,8 @@ export const editProfile = async (req, res) => {
     });
   }
 };
+
+
 
 export const suggestedUsers = async (req, res) =>{
   try {
