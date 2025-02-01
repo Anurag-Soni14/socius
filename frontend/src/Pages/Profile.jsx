@@ -87,10 +87,10 @@ const Profile = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
-        {displayPosts.map((post, index) => (
+        {displayPosts?.map((post, index) => (
           <div key={index} className="relative group cursor-pointer">
             <img
-              src={post.image}
+              src={post?.image}
               alt="Post"
               className="w-full h-40 object-cover rounded-md"
             />

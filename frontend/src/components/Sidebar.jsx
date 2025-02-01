@@ -16,10 +16,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 import CreatePost from "@/Pages/CreatePost";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
 
 function Sidebar() {
   const navigate = useNavigate();
   const { user } = useSelector((store) => store.auth);
+  const { likeNotification } = useSelector(
+    (store) => store.realTimeNotification
+  );
   const dispatch = useDispatch();
   const [openDialogForCreate, setOpenDialogForCreate] = useState(false);
 
@@ -51,6 +56,8 @@ function Sidebar() {
       navigate(`/profile/${user?._id}`);
     } else if (menu === "Home") {
       navigate("/");
+    } else if (menu === "Messages") {
+      navigate("/message");
     }
   };
 
@@ -84,13 +91,46 @@ function Sidebar() {
               className="cursor-pointer flex items-center gap-3 relative hover:bg-base-200 rounded-lg p-3 my-3"
               onClick={() => sidebarHandler(ListItem.text)}
             >
-              <span className={`text-base-content hover:text-primary`}>{ListItem.icon}</span>
+              <span className={`text-base-content hover:text-primary`}>
+                {ListItem.icon}
+              </span>
               <span className="text-base-content">{ListItem.text}</span>
+              {ListItem.text === "Notification" &&
+                likeNotification?.length > 0 && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button size="icon" className="rounded-full size-5 absolute bottom-6 left-6">{likeNotification?.length}</Button>
+
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <div>
+                        {
+                          likeNotification?.length === 0 ? (<p>No new Notification</p>) : (
+                            likeNotification.map((notification)=>{
+                              return (
+                                <div key={notification?.userId}>
+                                  <Avatar>
+                                    <AvatarImage src={notification?.userDetails?.profilePic} />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                  </Avatar>
+                                  <p className="text-sm"><span className="font-bold">{notification?.userDetails?.username} </span> liked your post</p>
+                                </div>
+                              )
+                            })  
+                          )
+                        }
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
             </div>
           ))}
         </div>
       </div>
-      <CreatePost openDialogForCreate={openDialogForCreate} setOpenDialogForCreate={setOpenDialogForCreate} />
+      <CreatePost
+        openDialogForCreate={openDialogForCreate}
+        setOpenDialogForCreate={setOpenDialogForCreate}
+      />
     </div>
   );
 }

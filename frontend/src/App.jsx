@@ -9,6 +9,12 @@ import Setting from "./Pages/Setting";
 import ChangeTheme from "./Pages/ChangeTheme";
 import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
+import MessagePage from "./Pages/MessagePage";
+import { useDispatch, useSelector } from "react-redux";
+import { setOnlineUsers } from "./redux/chatSlice";
+import { useSocket } from "./context/SocketContext";
+import { SocketProvider } from "./context/SocketContext.jsx";
+import { setLikeNotification } from "./redux/realTimeNotificationSlice";
 
 const browserRouter = createBrowserRouter([
   {
@@ -20,6 +26,7 @@ const browserRouter = createBrowserRouter([
       { path: "/account/settings", element: <Setting /> },
       { path: "/account/settings/edit-profile", element: <EditProfile /> },
       { path: "/account/settings/change-theme", element: <ChangeTheme /> },
+      { path: "/message", element: <MessagePage /> },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -28,16 +35,40 @@ const browserRouter = createBrowserRouter([
 
 const App = () => {
   const { theme } = useThemeStore();
+  const { user } = useSelector((store) => store.auth);
+  const socket = useSocket();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // Apply the theme globally to the <html> tag
+    if (user && socket) {
+      socket.connect(); // Ensure socket is connected if the user is logged in
+
+      // Listen for events like online users
+      socket.on("getOnlineUsers", (onlineUsers) => {
+        dispatch(setOnlineUsers(onlineUsers));
+      });
+
+      socket.on('notification',(notification)=>{
+        dispatch(setLikeNotification(notification));
+      })
+
+      return () => {
+        socket.off("getOnlineUsers"); // Clean up the event listener when component unmounts
+        socket.disconnect(); // Disconnect the socket when the user logs out
+      };
+    }
+  }, [user, socket, dispatch]); // Add socket to dependencies
+
+  useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]); // Re-run when theme changes
+  }, [theme]);
 
   return (
-    <div className="h-full min-h-screen">
-      <RouterProvider router={browserRouter} />
-    </div>
+    <SocketProvider>
+      <div className="h-full min-h-screen">
+        <RouterProvider router={browserRouter} />
+      </div>
+    </SocketProvider>
   );
 };
 

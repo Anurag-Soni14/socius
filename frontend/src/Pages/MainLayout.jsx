@@ -6,7 +6,7 @@ function MainLayout() {
   return (
     <div className="flex min-h-screen bg-base-100 text-base-content">
       <Sidebar />
-      <div className="flex-grow p-4">
+      <div className="flex-grow">
         <Outlet />
       </div>
     </div>

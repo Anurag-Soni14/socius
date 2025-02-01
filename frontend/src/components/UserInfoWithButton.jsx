@@ -8,7 +8,7 @@ const UserInfoWithButton = ({user}) => {
     <div className="flex items-center gap-16 justify-between my-2 p-2 rounded-md hover:bg-base-200">
       <div className="flex items-center">
         <Link to={`/profile/${user?._id}`}>
-          <Avatar className="size-10">
+          <Avatar className="size-10 bg-secondary">
             <AvatarImage src={user?.profilePic} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
