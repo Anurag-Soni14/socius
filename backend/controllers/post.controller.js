@@ -101,48 +101,39 @@ export const likePost = async (req, res) => {
   try {
     const likedUser = req.id;
     const postId = req.params.id;
-
     const post = await Post.findById(postId);
 
     if (!post) {
-      return res.status(404).json({
-        message: "Post not found",
-        success: false,
-      });
+      return res.status(404).json({ message: "Post not found", success: false });
     }
 
-    await Post.updateOne(
-      { _id: postId }, 
-      { $addToSet: { likes: likedUser } } 
-    );
+    await Post.updateOne({ _id: postId }, { $addToSet: { likes: likedUser } });
 
-    // Implement socket.io for real-time notifications (if applicable)
-    const user = await User.findById(likedUser).select('username profilePic');
+    const user = await User.findById(likedUser).select("username profilePic");
     const postOwnerId = post.author.toString();
-    if(postOwnerId !== likedUser){
-      // emit a notification event
+
+    if (postOwnerId !== likedUser) {
       const notification = {
-        type: 'like',
+        type: "like",
         userId: likedUser,
         userDetails: user,
         postId,
-        message: `Your post is was liked by ${likedUser}`
-      }
+        message: `Your post was liked by ${likedUser}`,
+      };
+
       const postOwnerSocketId = getReceiverSocketId(postOwnerId);
-      io.to(postOwnerSocketId).emit('notification', notification)
+      console.log("🔗 Backend socket instance:", io);
+      console.log("📨 Sending notification to:", postOwnerSocketId);
+
+      if (postOwnerSocketId) {
+        io.to(postOwnerSocketId).emit("notification", notification);
+      }
     }
 
-    return res.status(200).json({
-      message: "Post liked",
-      success: true,
-    });
+    return res.status(200).json({ message: "Post liked", success: true });
   } catch (error) {
     console.error("Error liking post:", error);
-    return res.status(500).json({
-      message: "Something went wrong",
-      success: false,
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Something went wrong", success: false });
   }
 };
 

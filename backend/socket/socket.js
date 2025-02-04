@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
 
   if (userId) {
     userSocketMap[userId] = socket.id;
-    // console.log(`✅ User Connected: userId = ${userId}, socketId = ${socket.id}`);
+    console.log(`✅ User Connected: userId = ${userId}, socketId = ${socket.id}`);
   }
 
   // Emit updated online users list to all clients
@@ -51,11 +51,13 @@ io.on("connection", (socket) => {
 
   // Handle user disconnection
   socket.on("disconnect", () => {
-    if (userId) {
-      delete userSocketMap[userId];
-      // console.log(`❌ User Disconnected: userId = ${userId}, socketId = ${socket.id}`);
-    }
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    setTimeout(() => {
+      if (userId && io.sockets.sockets.get(userSocketMap[userId]) === undefined) {
+        delete userSocketMap[userId];
+        console.log(`❌ User Disconnected: userId = ${userId}, socketId = ${socket.id}`);
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+      }
+    }, 3000); // Add a 3-second delay before removing the user
   });
 });
 

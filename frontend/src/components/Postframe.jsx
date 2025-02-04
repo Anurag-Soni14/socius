@@ -70,6 +70,53 @@ function Postframe({ post }) {
     }
   };
 
+  const commentHandler = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/v1/post/${post._id}/comment`,
+        { text },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        const updatedCommentData = [...comments, res.data.comment];
+        setComments(updatedCommentData);
+
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id ? { ...p, comments: updatedCommentData } : p
+        );
+
+        dispatch(setPosts(updatedPostData));
+        setText('');
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+
+      // toast.error(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const saveHander = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/v1/post/${post?._id}/save`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto my-4 border border-base-300 rounded-lg shadow-md bg-base-100 p-4">
       <div className="flex items-center justify-between">
@@ -98,11 +145,14 @@ function Postframe({ post }) {
               <DialogTitle>Buttons</DialogTitle>
               <DialogDescription>Post related buttons</DialogDescription>
             </VisuallyHidden>
-            <Button variant="ghost" className="text-error font-bold">
-              Unfollow
-            </Button>
+            {
+              post?.author?._id !== user?._id && (<Button variant="ghost" className="text-error font-bold">
+                Unfollow
+              </Button>)
+            }
+            
             <Button variant="ghost">Add to favorite</Button>
-            <Button variant="ghost">Bookmark</Button>
+            <Button variant="ghost" onClick={saveHander}>Save</Button>
             {user && post?.author?._id === user._id && (
               <Button
                 variant="ghost"
@@ -156,15 +206,18 @@ function Postframe({ post }) {
 
       <div className="flex items-center justify-between px-2">
         <button
-          className="text-base-content hover:text-error flex items-center gap-1"
+          className="text-base-content hover:text-red-600 flex items-center gap-1"
           onClick={postLikeOrDislike}
         >
-          {liked ? <FaHeart className="text-error" /> : <FaRegHeart />}
+          {liked ? <FaHeart className="text-red-600" /> : <FaRegHeart />}
           Like
         </button>
         <button
           className="text-base-content hover:text-primary flex items-center gap-1"
-          onClick={() => setShowCommentDialog(true)}
+          onClick={() => {
+            dispatch(setSelectedPost(post));
+            setShowCommentDialog(true);
+          }}
         >
           <MessageCircle /> Comments
         </button>

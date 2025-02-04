@@ -3,13 +3,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 function Signup() {
+  const {user} = useSelector((store) => store.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setLoding] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     fullname: "",
@@ -43,6 +46,7 @@ function Signup() {
           email: "",
           password: "",
         });
+        navigate("/login");
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -50,6 +54,12 @@ function Signup() {
       setLoding(false);
     }
   };
+
+  useEffect(() => {
+      if (user) {
+        navigate("/");
+      }
+    }, []);
 
   return (
     <div className="flex items-center w-screen h-screen justify-center bg-base-100">

@@ -99,16 +99,16 @@ function Sidebar() {
                 likeNotification?.length > 0 && (
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button size="icon" className="rounded-full size-5 absolute bottom-6 left-6">{likeNotification?.length}</Button>
+                      <Button size="icon" className="rounded-full size-5 absolute bottom-6 left-6 bg-red-600 hover:bg-red-600">{likeNotification?.length}</Button>
 
                     </PopoverTrigger>
                     <PopoverContent>
-                      <div>
+                      <div className="flex flex-col gap-2">
                         {
                           likeNotification?.length === 0 ? (<p>No new Notification</p>) : (
                             likeNotification.map((notification)=>{
                               return (
-                                <div key={notification?.userId}>
+                                <div key={notification?.userId} className="flex items-center gap-2">
                                   <Avatar>
                                     <AvatarImage src={notification?.userDetails?.profilePic} />
                                     <AvatarFallback>CN</AvatarFallback>

@@ -13,13 +13,18 @@ import MessagePage from "./Pages/MessagePage";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { useSocket } from "./context/SocketContext";
-import { SocketProvider } from "./context/SocketContext.jsx";
-import { setLikeNotification } from "./redux/realTimeNotificationSlice";
+import { setLikeNotification } from "./redux/rtnSlice";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const browserRouter = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoutes>
+        {" "}
+        <MainLayout />{" "}
+      </ProtectedRoutes>
+    ),
     children: [
       { path: "/", element: <Home /> },
       { path: "/profile/:id", element: <Profile /> },
@@ -36,39 +41,40 @@ const browserRouter = createBrowserRouter([
 const App = () => {
   const { theme } = useThemeStore();
   const { user } = useSelector((store) => store.auth);
-  const socket = useSocket();
+  const socket = useSocket(); // ✅ Now socket will not be null
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (user && socket) {
-      socket.connect(); // Ensure socket is connected if the user is logged in
+      socket.connect();
+      // console.log("✅ Socket connected in App.jsx with ID:", socket?.id);
 
-      // Listen for events like online users
       socket.on("getOnlineUsers", (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
       });
 
-      socket.on('notification',(notification)=>{
+      socket.on("notification", (notification) => {
         dispatch(setLikeNotification(notification));
-      })
+      });
 
       return () => {
-        socket.off("getOnlineUsers"); // Clean up the event listener when component unmounts
-        socket.disconnect(); // Disconnect the socket when the user logs out
+        socket.off("getOnlineUsers");
+        socket.off("notification");
+        socket.disconnect();
       };
+    } else {
+      console.log("⚠️ Socket is NOT connected in App.jsx.");
     }
-  }, [user, socket, dispatch]); // Add socket to dependencies
+  }, [user, socket, dispatch]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   return (
-    <SocketProvider>
-      <div className="h-full min-h-screen">
-        <RouterProvider router={browserRouter} />
-      </div>
-    </SocketProvider>
+    <div className="h-full min-h-screen">
+      <RouterProvider router={browserRouter} />
+    </div>
   );
 };
 
