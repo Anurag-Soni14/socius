@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { setAuthUser } from "@/redux/authSlice";
 import axios from "axios";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, CameraIcon, Loader2 } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -14,45 +14,64 @@ import { toast } from "sonner";
 const EditProfile = () => {
   const { user } = useSelector((store) => store.auth);
   const imageRef = useRef();
+  const coverRef = useRef();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState({
     profilePic: user?.profilePic,
+    coverPhoto: user?.coverPhoto,
     username: user?.username,
     fullname: user?.fullname,
     email: user?.email,
     bio: user?.bio,
     gender: user?.gender,
+    location: user?.location || "",
+    website: user?.website || "",
+    interests: user?.interests?.join(", ") || "",
+    isPrivate: user?.isPrivate || false, // Ensure it's controlled
   });
 
-  const fileChangeHandler = (e) => {
+  const fileChangeHandler = (e, field) => {
     const file = e.target.files?.[0];
-    if (file) setInput({ ...input, profilePic: file });
+    if (file) setInput({ ...input, [field]: file });
   };
 
   const inputChangeHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "interests") {
+      // Handle interests as an array
+      setInput({
+        ...input,
+        [name]: value.split(",").map((interest) => interest.trim()), // Ensure it's an array
+      });
+    } else {
+      setInput({ ...input, [name]: value });
+    }
   };
 
   const editProfileHandler = async (e) => {
     e.preventDefault();
-
+  
+    console.log("Profile Data to be sent to backend:", input); // Log the data
+  
     const formData = new FormData();
-
-    if (input.username) formData.append("username", input.username);
-    if (input.fullname) formData.append("fullname", input.fullname);
-    if (input.email) formData.append("email", input.email);
-    if (input.bio) formData.append("bio", input.bio);
-    if (input.gender) formData.append("gender", input.gender);
-
-    if (input.profilePic && input.profilePic instanceof File) {
-      formData.append("profilePic", input.profilePic);
-    }
-
+    Object.keys(input).forEach((key) => {
+      if (input[key] !== undefined && input[key] !== null) {
+        if (key === "interests" && Array.isArray(input[key])) {
+          // Only join interests if it's an array
+          formData.append(key, input[key].join(", "));
+        } else {
+          // For all other fields, append them as they are
+          formData.append(key, input[key]);
+        }
+      }
+    });
+  
     try {
       setLoading(true);
-
+  
       const res = await axios.post(
         `http://localhost:5000/api/v1/user/profile/edit`,
         formData,
@@ -61,19 +80,9 @@ const EditProfile = () => {
           withCredentials: true,
         }
       );
-
+  
       if (res.data.success) {
-        const updatedUserData = {
-          ...user,
-          username: res.data.user?.username,
-          fullname: res.data.user?.fullname,
-          email: res.data.user?.email,
-          bio: res.data.user?.bio,
-          gender: res.data.user?.gender,
-          profilePic: res.data.user?.profilePic,
-        };
-
-        dispatch(setAuthUser(updatedUserData));
+        dispatch(setAuthUser(res.data.user));
         navigate(`/profile/${user?._id}`);
         toast.success(res.data.message);
       } else {
@@ -85,20 +94,50 @@ const EditProfile = () => {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-base-100 rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold text-center mb-6 text-primary">Edit Profile</h2>
+      <h2 className="text-3xl font-bold text-center mb-6 text-primary">
+        Edit Profile
+      </h2>
 
       <div className="relative flex flex-col items-center mb-6">
-        <div className="relative">
-          <Avatar className="size-24 rounded-full object-cover border-4 border-base-300">
-            <AvatarImage src={input?.profilePic} />
+        <div className="relative w-full h-40 bg-base-300 rounded-md">
+          {user?.coverPhoto ? (
+            <img
+              src={input.coverPhoto}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-primary to-secondary"></div>
+          )}
+          <button
+            className="absolute bottom-2 right-2 bg-gray-900 text-white p-2 text-xs rounded-full flex items-center gap-1 hover:bg-gray-700"
+            aria-label="Change Cover"
+            onClick={() => coverRef.current.click()} // Trigger file input
+          >
+            <CameraIcon className="size-4" />
+            Change
+          </button>
+        </div>
+        <input
+          type="file"
+          ref={coverRef}
+          onChange={(e) => fileChangeHandler(e, "coverPhoto")}
+          className="hidden"
+          accept="image/*"
+        />
+        <div className="relative -mt-10">
+          <Avatar className="size-24 border-4 border-base-300">
+            <AvatarImage src={input.profilePic} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <button
             onClick={() => imageRef?.current.click()}
-            className="absolute bottom-0 right-0 transform translate-x-2 translate-y-2 bg-base-200 p-2 rounded-full hover:bg-opacity-90 transition-all"
+            className="absolute bottom-0 right-0 bg-base-200 p-2 rounded-full"
           >
             <Camera size={18} className="text-white" />
           </button>
@@ -106,94 +145,97 @@ const EditProfile = () => {
         <input
           type="file"
           ref={imageRef}
-          onChange={fileChangeHandler}
+          onChange={(e) => fileChangeHandler(e, "profilePic")}
           className="hidden"
           accept="image/*"
         />
       </div>
 
-      <div className="flex justify-center space-x-6 mb-6 text-center">
-        {[{ label: "Posts", count: user?.posts?.length }, { label: "Followers", count: user?.followers?.length }, { label: "Following", count: user?.followings?.length }, { label: "Saved", count: user?.saved?.length }].map((item, index) => (
-          <div key={index}>
-            <span className="block font-bold text-lg text-primary">{item.count}</span>
-            <span className="text-base-content">{item.label}</span>
-          </div>
-        ))}
-      </div>
-
       <form className="space-y-4" onSubmit={editProfileHandler}>
-        <div>
-          <Label className="block text-base-content font-medium">Username</Label>
-          <Input
-            type="text"
-            name="username"
-            value={input?.username}
-            onChange={inputChangeHandler}
-            className="w-full p-3 my-2 focus-visible:ring-primary border rounded-md bg-base-100"
-          />
-        </div>
-        <div>
-          <Label className="block text-base-content font-medium">Full name</Label>
-          <Input
-            type="text"
-            name="fullname"
-            value={input?.fullname}
-            onChange={inputChangeHandler}
-            className="w-full p-3 my-2 focus-visible:ring-primary border rounded-md bg-base-100"
-          />
-        </div>
-        <div>
-          <Label className="block text-base-content font-medium">Email</Label>
-          <Input
-            type="email"
-            name="email"
-            value={input?.email}
-            onChange={inputChangeHandler}
-            className="w-full p-3 my-2 focus-visible:ring-primary border rounded-md bg-base-100"
-          />
-        </div>
-
-        <div>
-          <Label className="block text-base-content font-medium">Bio</Label>
-          <Textarea
-            name="bio"
-            value={input?.bio}
-            onChange={inputChangeHandler}
-            className="w-full p-3 my-2 focus-visible:ring-primary border rounded-md bg-base-100"
-            rows="3"
-          ></Textarea>
-        </div>
-
-        <div>
-          <Label className="block text-base-content font-medium">Gender</Label>
+        <Label>Username</Label>
+        <Input
+          type="text"
+          name="username"
+          value={input.username}
+          onChange={inputChangeHandler}
+        />
+        <Label>Full name</Label>
+        <Input
+          type="text"
+          name="fullname"
+          value={input.fullname}
+          onChange={inputChangeHandler}
+        />
+        <Label>Email</Label>
+        <Input
+          type="email"
+          name="email"
+          value={input.email}
+          onChange={inputChangeHandler}
+        />
+        <Label>Bio</Label>
+        <Textarea
+          name="bio"
+          value={input.bio}
+          onChange={inputChangeHandler}
+          rows="3"
+        />
+        <Label>Gender</Label>
+        <div className="mb-4">
           <select
             name="gender"
-            value={input?.gender}
+            value={input.gender}
             onChange={inputChangeHandler}
-            className="w-full p-3 my-2 focus-visible:ring-primary border rounded-md bg-base-100"
+            className="select select-bordered w-full"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
         </div>
+        <Label>Location</Label>
+        <Input
+          type="text"
+          name="location"
+          value={input.location}
+          onChange={inputChangeHandler}
+          className="mb-4"
+        />
+        <Label>Website</Label>
+        <Input
+          type="text"
+          name="website"
+          value={input.website}
+          onChange={inputChangeHandler}
+        />
+        <Label>Interests (comma-separated)</Label>
+        <Input
+          type="text"
+          name="interests"
+          value={input.interests}
+          onChange={inputChangeHandler}
+        />
+        <div className="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id="privacy"
+            checked={input.isPrivate}
+            onChange={
+              () => setInput({ ...input, isPrivate: !input.isPrivate }) // Toggle the value
+            }
+          />
+          <Label htmlFor="privacy">Private Account</Label>
+        </div>
 
-        {loading ? (
-          <Button
-            type="submit"
-            className="w-full bg-primary text-white p-3 rounded-md font-semibold hover:bg-primary-focus transition"
-          >
+        <Button
+          type="submit"
+          className="w-full bg-primary text-white p-3 rounded-md font-semibold hover:bg-primary-focus transition"
+        >
+          {loading ? (
             <Loader2 className="mr-2 size-4 animate-spin" />
-            Please wait...
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            onClick={editProfileHandler}
-            className="w-full bg-primary text-white p-3 rounded-md font-semibold hover:bg-primary-focus transition"
-          >
-            Save Changes
-          </Button>
-        )}
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
       </form>
     </div>
   );

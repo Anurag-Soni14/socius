@@ -76,7 +76,7 @@ export const login = async (req, res) => {
 
     // populate each post id in the post array
     const populatedPosts = await Promise.all(
-      user.posts.map(async (postId) => {
+      user?.posts?.map(async (postId) => {
         const post = await Post.findById(postId);
         // Check if the post exists
         if (post && post.author.equals(user._id)) {
@@ -92,11 +92,20 @@ export const login = async (req, res) => {
       fullname: user.fullname,
       email: user.email,
       profilePic: user.profilePic,
+      coverPhoto: user.coverPhoto,
       bio: user.bio,
+      gender: user.gender,
+      location: user.location,
+      website: user.website,
       followers: user.followers,
       followings: user.followings,
       posts: user.posts,
-      saved: user.saved
+      liked: user.liked,
+      saved: user.saved,
+      interests: user.interests,
+      joinedAt: user.joinedAt,
+      isPrivate: user.isPrivate,
+      blockedUsers: user.blockedUsers
     }
 
     return res.cookie('token', token, {httpOnly: true, sameSite: 'strict', maxAge: 7*24*60*60*1000}).json({
@@ -124,7 +133,7 @@ export const logout = async (req, res)=>{
 export const getProfile = async (req, res)=>{
   try {
     const userId = req.params.id;
-    let user = await User.findById(userId).populate({path:'posts', createdAt:-1}).populate('saved');
+    let user = await User.findById(userId).populate({path:'posts', createdAt:-1}).populate('saved').populate('followers').populate('followings').select('-password');
     return res.status(200).json({
       user,
       success: true
@@ -135,68 +144,12 @@ export const getProfile = async (req, res)=>{
 }
 
 
-
-// export const editProfile = async (req, res) => {
-//   try {
-//     const userId = req.id; // Get authenticated user ID
-//     const { username, fullname, email, bio, gender } = req.body; // Get fields from request body
-//     const profilePic = req.file; // Get uploaded file
-//     let cloudResponse;
-
-//     // Handle profile picture upload if provided
-//     if (profilePic) {
-//       try {
-//         const fileUri = getDataUri(profilePic); // Convert file to Data URI
-//         cloudResponse = await cloudinary.uploader.upload(fileUri.content); // Upload to Cloudinary
-//       } catch (err) {
-//         return res.status(500).json({
-//           message: "Failed to upload profile picture",
-//           success: false,
-//           error: err.message,
-//         });
-//       }
-//     }
-
-//     // Find user in the database
-//     const user = await User.findById(userId).select("-password");
-//     if (!user) {
-//       return res.status(404).json({
-//         message: "User not found",
-//         success: false,
-//       });
-//     }
-
-//     // Update user fields
-//     if (username) user.username = username;
-//     if (fullname) user.fullname = fullname;
-//     if (email) user.email = email;
-//     if (bio) user.bio = bio;
-//     if (gender) user.gender = gender;
-//     if (profilePic && cloudResponse) user.profilePic = cloudResponse.secure_url;
-
-//     // Save changes
-//     await user.save();
-
-//     return res.status(200).json({
-//       message: "Profile updated successfully",
-//       success: true,
-//       user,
-//     });
-//   } catch (error) {
-//     console.error("Error in editProfile:", error); // Log the error for debugging
-//     return res.status(500).json({
-//       message: "Something went wrong while updating the profile",
-//       success: false,
-//       error: error.message,
-//     });
-//   }
-// };
-
 export const editProfile = async (req, res) => {
   try {
-    const userId = req.id; 
-    const { username, fullname, email, bio, gender } = req.body; 
-    const profilePic = req.file; 
+    const userId = req.id;
+    const { username, fullname, email, bio, gender, coverPhoto, interests, isPrivate } = req.body; // Destructure interests and isPrivate
+
+    const profilePic = req.files?.profilePic ? req.files.profilePic[0] : null; // Check if profilePic exists
     let cloudResponse;
 
     const user = await User.findById(userId).select("-password");
@@ -207,30 +160,11 @@ export const editProfile = async (req, res) => {
       });
     }
 
-    if (username && username !== user.username) {
-      const existingUser = await User.findOne({ username, _id: { $ne: userId } });
-      if (existingUser) {
-        return res.status(400).json({
-          message: "Username is already taken. Please choose another one.",
-          success: false,
-        });
-      }
-    }
-
-    if (email && email !== user.email) {
-      const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
-      if (existingEmail) {
-        return res.status(400).json({
-          message: "Email is already in use. Please use a different email.",
-          success: false,
-        });
-      }
-    }
-
+    // If profilePic exists, upload to Cloudinary
     if (profilePic) {
       try {
-        const fileUri = getDataUri(profilePic); 
-        cloudResponse = await cloudinary.uploader.upload(fileUri.content); 
+        const fileUri = getDataUri(profilePic);
+        cloudResponse = await cloudinary.uploader.upload(fileUri.content);
       } catch (err) {
         return res.status(500).json({
           message: "Failed to upload profile picture",
@@ -247,6 +181,9 @@ export const editProfile = async (req, res) => {
     if (bio && bio !== user.bio) updatedFields.bio = bio;
     if (gender && gender !== user.gender) updatedFields.gender = gender;
     if (profilePic && cloudResponse) updatedFields.profilePic = cloudResponse.secure_url;
+    if (coverPhoto) updatedFields.coverPhoto = coverPhoto; // Handle the coverPhoto update if necessary
+    if (interests) updatedFields.interests = interests.split(",").map((interest) => interest.trim()); // Handle interests as an array
+    if (isPrivate !== undefined) updatedFields.isPrivate = isPrivate; // Ensure privacy is handled
 
     if (Object.keys(updatedFields).length === 0) {
       return res.status(200).json({
@@ -276,6 +213,8 @@ export const editProfile = async (req, res) => {
 
 
 
+
+
 export const suggestedUsers = async (req, res) =>{
   try {
     const suggestedUsers = await User.find({_id:{$ne:req.id}}).select("-password");
@@ -294,52 +233,67 @@ export const suggestedUsers = async (req, res) =>{
   }
 }
 
-export const followOrUnfollow = async (req, res) =>{
+export const followOrUnfollow = async (req, res) => {
   try {
-    const userId = req.id;
-    const folliwingUserId = req.params.id;
+    const userId = req.id; // Logged-in user ID
+    const followingUserId = req.params.id; // User to follow/unfollow
 
-    if(userId === folliwingUserId){
+    if (userId === followingUserId) {
       return res.status(400).json({
         message: "You can't follow and unfollow yourself",
         success: false
-      })
+      });
     }
 
     const user = await User.findById(userId);
-    const folliwingUser = await User.findById(folliwingUserId);
+    const followingUser = await User.findById(followingUserId);
 
-    if(!user || !folliwingUser){
-      return res.status(400).json({
-        message: "user not found",
+    if (!user || !followingUser) {
+      return res.status(404).json({
+        message: "User not found",
         success: false
-      })
+      });
     }
 
-    const isFollowing = user.followings.includes(folliwingUserId)
-    if(isFollowing){
-      // unfollow logic
-      await Promise.all([
-        User.updateOne({_id: userId}, {$pull:{followings: folliwingUserId}}),
-        User.updateOne({_id: folliwingUserId}, {$pull:{followers: userId}}),
-      ])
-      return res.status(200).json({
-        message:"unfollow",
-        success: true
-      })
-    }else{
-      // follow logic
-      await Promise.all([
-        User.updateOne({_id: userId}, {$push:{followings: folliwingUserId}}),
-        User.updateOne({_id: folliwingUserId}, {$push:{followers: userId}}),
-      ])
-      return res.status(200).json({
-        message:"following",
-        success: true
-      })
-    }
+    const isFollowing = user.followings.includes(followingUserId);
 
+    if (isFollowing) {
+      // Unfollow logic
+      await Promise.all([
+        User.findByIdAndUpdate(userId, { $pull: { followings: followingUserId } }, { new: true }),
+        User.findByIdAndUpdate(followingUserId, { $pull: { followers: userId } }, { new: true })
+      ]);
+
+      const newUserData = await User.findById(userId);
+      const newFollowingUser = await User.findById(followingUserId);
+      return res.status(200).json({
+        message: "Unfollowing",
+        user: newUserData,
+        followingUser: newFollowingUser,
+        success: true
+      });
+    } else {
+      // Follow logic
+      await Promise.all([
+        User.findByIdAndUpdate(userId, { $push: { followings: followingUserId } }, { new: true }),
+        User.findByIdAndUpdate(followingUserId, { $push: { followers: userId } }, { new: true })
+      ]);
+
+      const newUserData = await User.findById(userId);
+      const newFollowingUser = await User.findById(followingUserId);
+      return res.status(200).json({
+        message: "Following",
+        user: newUserData,
+        followingUser: newFollowingUser,
+        success: true
+      });
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Follow/Unfollow Error:", error);
+    return res.status(500).json({
+      message: "An error occurred while processing your request",
+      error: error.message,
+      success: false
+    });
   }
-}
+};

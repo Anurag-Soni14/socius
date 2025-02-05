@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const corsOption = {
     origin: "http://localhost:5173",  // Ensure this matches frontend
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
 };
 app.use(cors(corsOption));

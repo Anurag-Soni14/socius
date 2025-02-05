@@ -22,6 +22,7 @@ const authSlice = createSlice({
         setSelectedUser:(state, action)=>{
             state.selectedUser = action.payload;
         },
+        
     }
 });
 

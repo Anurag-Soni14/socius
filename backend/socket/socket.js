@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
 
   if (userId) {
     userSocketMap[userId] = socket.id;
-    console.log(`✅ User Connected: userId = ${userId}, socketId = ${socket.id}`);
+    // console.log(`✅ User Connected: userId = ${userId}, socketId = ${socket.id}`);
   }
 
   // Emit updated online users list to all clients
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (messageData) => {
     const { senderId, receiverId, text } = messageData;
 
-    console.log(`📩 New Message from ${senderId} to ${receiverId}: ${text}`);
+    // console.log(`📩 New Message from ${senderId} to ${receiverId}: ${text}`);
 
     // Save the message in the database (Example - Modify based on your DB schema)
     // You can integrate this inside your `message.route.js` if needed
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", messageData); // ✅ Send real-time message to receiver
-      console.log(`🚀 Message sent to receiver (Socket ID: ${receiverSocketId})`);
+      // console.log(`🚀 Message sent to receiver (Socket ID: ${receiverSocketId})`);
     } else {
       console.log(`⚠️ Receiver (${receiverId}) is offline, storing message in DB.`);
     }
@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
     setTimeout(() => {
       if (userId && io.sockets.sockets.get(userSocketMap[userId]) === undefined) {
         delete userSocketMap[userId];
-        console.log(`❌ User Disconnected: userId = ${userId}, socketId = ${socket.id}`);
+        // console.log(`❌ User Disconnected: userId = ${userId}, socketId = ${socket.id}`);
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
       }
     }, 3000); // Add a 3-second delay before removing the user

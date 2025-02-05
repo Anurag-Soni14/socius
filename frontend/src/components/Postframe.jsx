@@ -17,12 +17,16 @@ import axios from "axios";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Badge } from "./ui/badge";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import useGetUserProfile from "@/hooks/useGetUserProfile";
+import { setUserProfile } from "@/redux/authSlice";
 
 function Postframe({ post }) {
   const captionRef = useRef(null);
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.posts);
   const dispatch = useDispatch();
+  useGetUserProfile(user?._id);
+  const { userProfile } = useSelector((store) => store.auth);
   const [showFullCaption, setShowFullCaption] = useState(false);
   const [text, setText] = useState("");
   const [showCommentDialog, setShowCommentDialog] = useState(false);
@@ -30,6 +34,9 @@ function Postframe({ post }) {
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLike, setPostLike] = useState(post.likes.length);
   const [comments, setComments] = useState(post.comments);
+  const isSaved = userProfile?.saved?.some(
+    (savedPost) => savedPost?._id === post?._id
+  );
 
   useEffect(() => {
     if (captionRef.current) {
@@ -92,7 +99,7 @@ function Postframe({ post }) {
         );
 
         dispatch(setPosts(updatedPostData));
-        setText('');
+        setText("");
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -109,13 +116,38 @@ function Postframe({ post }) {
         `http://localhost:5000/api/v1/post/${post?._id}/save`,
         { withCredentials: true }
       );
+  
       if (res.data.success) {
         toast.success(res.data.message);
+  
+        // Update the user profile state after saving/unsaving
+        dispatch(
+          setUserProfile({
+            ...userProfile,
+            saved: isSaved
+              ? userProfile.saved.filter((p) => p._id !== post._id) // Remove from saved
+              : [...userProfile.saved, post], // Add to saved
+          })
+        );
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     }
   };
+
+  const deletePostHandler = async (postId)=>{
+    try {
+      const res = await axios.delete(`http://localhost:5000/api/v1/post/delete/${postId}`,{withCredentials: true});
+
+      if(res.data.success){
+        toast(res.data.message);
+        dispatch(setPosts(posts.filter((post) => post._id !== postId)));
+      }
+    } catch (error) {
+      toast.error(error.response.data.message)
+    }
+  }
+  
 
   return (
     <div className="max-w-md mx-auto my-4 border border-base-300 rounded-lg shadow-md bg-base-100 p-4">
@@ -145,14 +177,18 @@ function Postframe({ post }) {
               <DialogTitle>Buttons</DialogTitle>
               <DialogDescription>Post related buttons</DialogDescription>
             </VisuallyHidden>
-            {
-              post?.author?._id !== user?._id && (<Button variant="ghost" className="text-error font-bold">
+            {post?.author?._id !== user?._id && (
+              <Button variant="ghost" className="text-error font-bold">
                 Unfollow
-              </Button>)
-            }
-            
+              </Button>
+            )}
+
             <Button variant="ghost">Add to favorite</Button>
-            <Button variant="ghost" onClick={saveHander}>Save</Button>
+            
+              <Button variant="ghost" onClick={saveHander}>
+                {isSaved ? "Unsave" : "Save"}
+              </Button>
+
             {user && post?.author?._id === user._id && (
               <Button
                 variant="ghost"
