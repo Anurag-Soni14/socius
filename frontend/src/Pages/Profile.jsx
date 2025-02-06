@@ -14,6 +14,7 @@ import {
 } from "@/redux/authSlice";
 import { toast } from "sonner";
 import axios from "axios";
+import useGetUser from "@/hooks/useGetUser";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -21,12 +22,17 @@ const Profile = () => {
   const navigate = useNavigate();
   const userId = params.id;
   useGetUserProfile(userId);
+  useGetUser();
   const [isLoading, setIsLoading] = useState(false);
   const { userProfile, user } = useSelector((store) => store.auth);
   const [activeTab, setActiveTab] = useState("posts");
-  const [isFollowing, setIsFollowing] = useState(
-    user?.followings?.includes(userProfile?._id) || false
-  );
+  const [isFollowing, setIsFollowing] = useState(false);
+  useEffect(() => {
+    if (user && userProfile) {
+      setIsFollowing(user.followings.includes(userProfile._id));
+    }
+  }, [user, userProfile]);
+
   const [userProfileFollowers, setUserProfileFollowers] = useState(
     userProfile?.followers?.length
   );
@@ -179,7 +185,7 @@ const Profile = () => {
         {/* Followers & Following Stats */}
         <div className="flex justify-start gap-8 mt-6 text-sm text-gray-700">
           <div>
-            <span className="font-bold">{userProfileFollowers}</span> Followers
+            <span className="font-bold">{userProfile?.followers.length}</span> Followers
           </div>
           <div>
             <span className="font-bold">{userProfile?.followings?.length}</span>{" "}

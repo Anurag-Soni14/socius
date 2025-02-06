@@ -13,7 +13,7 @@ import MessagePage from "./Pages/MessagePage";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { useSocket } from "./context/SocketContext";
-import { setLikeNotification } from "./redux/rtnSlice";
+import { setLikeNotification, setMessageNotification } from "./redux/rtnSlice";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const browserRouter = createBrowserRouter([
@@ -47,16 +47,20 @@ const App = () => {
   useEffect(() => {
     if (user && socket) {
       socket.connect();
-      // console.log("✅ Socket connected in App.jsx with ID:", socket?.id);
-
+  
       socket.on("getOnlineUsers", (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
       });
-
+  
       socket.on("notification", (notification) => {
-        dispatch(setLikeNotification(notification));
+        if (notification.type === "like" || notification.type === "dislike") {
+          dispatch(setLikeNotification(notification));
+        } else if (notification.type === "message") {
+          console.log(notification);
+          dispatch(setMessageNotification(notification));
+        }
       });
-
+  
       return () => {
         socket.off("getOnlineUsers");
         socket.off("notification");
@@ -66,6 +70,8 @@ const App = () => {
       console.log("⚠️ Socket is NOT connected in App.jsx.");
     }
   }, [user, socket, dispatch]);
+  
+  
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
