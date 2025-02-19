@@ -217,6 +217,24 @@ export const addComment = async (req, res) => {
 
     await post.save();
 
+    // ✅ Send real-time notification to post owner
+    if (post.author._id.toString() !== userId) {
+      const notification = {
+        type: "comment",
+        message: `${comment.author.username} commented on your post.`,
+        senderId: userId,
+        receiverId: post.author._id.toString(),
+        postId,
+        timestamp: new Date(),
+      };
+
+      const receiverSocketId = getReceiverSocketId(post.author._id.toString());
+
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("notification", notification);
+      }
+    }
+
     return res.status(201).json({
       message: "Comment Added",
       comment,

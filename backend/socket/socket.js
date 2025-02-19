@@ -49,6 +49,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("sendNotification", ({ receiverId, notification }) => {
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("notification", notification);
+    }
+  });
+
   // Handle user disconnection
   socket.on("disconnect", () => {
     setTimeout(() => {

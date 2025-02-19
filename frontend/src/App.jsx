@@ -13,7 +13,7 @@ import MessagePage from "./Pages/MessagePage";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { useSocket } from "./context/SocketContext";
-import { setLikeNotification, setMessageNotification } from "./redux/rtnSlice";
+import { setCommentNotification, setFollowNotification, setLikeNotification, setMessageNotification } from "./redux/rtnSlice";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const browserRouter = createBrowserRouter([
@@ -58,6 +58,12 @@ const App = () => {
         } else if (notification.type === "message") {
           console.log(notification);
           dispatch(setMessageNotification(notification));
+        } else if (notification.type === "follow") {
+          console.log(notification);
+          dispatch(setFollowNotification(notification));
+        } else if (notification.type === "comment") {
+          console.log(notification);
+          dispatch(setCommentNotification(notification));
         }
       });
   

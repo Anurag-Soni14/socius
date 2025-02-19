@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const register = async (req, res) => {
   try {
@@ -293,6 +294,22 @@ export const followOrUnfollow = async (req, res) => {
 
       const newUserData = await User.findById(userId);
       const newFollowingUser = await User.findById(followingUserId);
+
+       // ✅ Send real-time notification to followed user
+       const notification = {
+        type: "follow",
+        message: `${user.username} started following you.`,
+        senderId: userId,
+        receiverId: followingUserId,
+        timestamp: new Date(),
+      };
+
+      const receiverSocketId = getReceiverSocketId(followingUserId);
+
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("notification", notification);
+      }
+
       return res.status(200).json({
         message: "Following",
         user: newUserData,
