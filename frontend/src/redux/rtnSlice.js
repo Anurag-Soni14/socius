@@ -1,68 +1,75 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Load notification history from localStorage
+const loadNotificationHistory = () => {
+  const storedHistory = localStorage.getItem("notificationHistory");
+  return storedHistory ? JSON.parse(storedHistory) : [];
+};
+
 const initialState = {
-  likeNotification: [],
+  newNotifications: [],
+  notificationHistory: loadNotificationHistory(),
   messageNotification: [],
-  followNotification: [], // Ensure this is initialized
-  commentNotification: [], // Ensure this is initialized
 };
 
 const rtnSlice = createSlice({
   name: "realTimeNotification",
   initialState,
   reducers: {
-    setLikeNotification: (state, action) => {
-      if (action.payload.type === "like") {
-        state.likeNotification.push(action.payload);
-      } else if (action.payload.type === "dislike") {
-        state.likeNotification = state.likeNotification.filter(
-          (item) => item.userId !== action.payload.userId
-        );
+    addNotification: (state, action) => {
+      if (!Array.isArray(state.newNotifications)) {
+        state.newNotifications = [];
       }
+      state.newNotifications.push(action.payload);
     },
 
     setMessageNotification: (state, action) => {
+      if (!Array.isArray(state.messageNotification)) {
+        state.messageNotification = [];
+      }
       state.messageNotification.push(action.payload);
     },
 
-    setFollowNotification: (state, action) => {
-      if (!state.followNotification) {
-        state.followNotification = []; // Ensure array exists
+    markNotificationsAsSeen: (state) => {
+      if (!Array.isArray(state.newNotifications)) {
+        state.newNotifications = [];
       }
-      state.followNotification.push(action.payload);
-    },
-
-    setCommentNotification: (state, action) => {
-      if (!state.commentNotification) {
-        state.commentNotification = []; // Ensure array exists
+      if (!Array.isArray(state.notificationHistory)) {
+        state.notificationHistory = [];
       }
-      state.commentNotification.push(action.payload);
+      state.notificationHistory = [
+        ...state.newNotifications,
+        ...state.notificationHistory,
+      ];
+      state.newNotifications = [];
+      localStorage.setItem(
+        "notificationHistory",
+        JSON.stringify(state.notificationHistory)
+      );
     },
 
     clearLikeNotifications: (state) => {
-      state.likeNotification = [];
+      state.newNotifications = [];
     },
+
     clearMessageNotifications: (state) => {
       state.messageNotification = [];
     },
-    clearFollowNotifications: (state) => {
-      state.followNotification = [];
-    },
-    clearCommentNotifications: (state) => {
-      state.commentNotification = [];
+
+    clearAllNotifications: (state) => {
+      state.notificationHistory = []; // Clear all stored notifications
+      localStorage.removeItem("notificationHistory"); // Remove from localStorage
     },
   },
 });
 
 export const {
-  setLikeNotification,
+  addNotification,
   setMessageNotification,
-  setFollowNotification,
-  setCommentNotification,
+  markNotificationsAsSeen,
   clearLikeNotifications,
   clearMessageNotifications,
-  clearFollowNotifications,
-  clearCommentNotifications,
+  clearAllNotifications,
 } = rtnSlice.actions;
 
 export default rtnSlice.reducer;

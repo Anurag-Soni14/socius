@@ -13,8 +13,10 @@ import MessagePage from "./Pages/MessagePage";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { useSocket } from "./context/SocketContext";
-import { setCommentNotification, setFollowNotification, setLikeNotification, setMessageNotification } from "./redux/rtnSlice";
+// import { setCommentNotification, setFollowNotification, setLikeNotification, setMessageNotification } from "./redux/rtnSlice";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import NotificationPage from "./Pages/NotificationPage";
+import { addNotification, setMessageNotification } from "./redux/rtnSlice";
 
 const browserRouter = createBrowserRouter([
   {
@@ -32,6 +34,7 @@ const browserRouter = createBrowserRouter([
       { path: "/account/settings/edit-profile", element: <EditProfile /> },
       { path: "/account/settings/change-theme", element: <ChangeTheme /> },
       { path: "/message", element: <MessagePage /> },
+      { path: "/notifications", element: <NotificationPage /> },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -53,17 +56,10 @@ const App = () => {
       });
   
       socket.on("notification", (notification) => {
-        if (notification.type === "like" || notification.type === "dislike") {
-          dispatch(setLikeNotification(notification));
+        if (notification.type === "like" || notification.type === "dislike" || notification.type === "follow" || notification.type === "comment") {
+          dispatch(addNotification(notification)); // Store in newNotifications
         } else if (notification.type === "message") {
-          console.log(notification);
-          dispatch(setMessageNotification(notification));
-        } else if (notification.type === "follow") {
-          console.log(notification);
-          dispatch(setFollowNotification(notification));
-        } else if (notification.type === "comment") {
-          console.log(notification);
-          dispatch(setCommentNotification(notification));
+          dispatch(setMessageNotification(notification)); // Store separately
         }
       });
   
@@ -76,6 +72,7 @@ const App = () => {
       console.log("⚠️ Socket is NOT connected in App.jsx.");
     }
   }, [user, socket, dispatch]);
+  
   
   
 

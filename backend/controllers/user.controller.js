@@ -296,12 +296,19 @@ export const followOrUnfollow = async (req, res) => {
       const newFollowingUser = await User.findById(followingUserId);
 
        // ✅ Send real-time notification to followed user
-       const notification = {
+       //const notification = {
+        //type: "follow",
+        //message: `${user.username} started following you.`,
+        //senderId: userId,
+        //receiverId: followingUserId,
+        //timestamp: new Date(),
+      //};
+
+      const notification = {
         type: "follow",
-        message: `${user.username} started following you.`,
-        senderId: userId,
-        receiverId: followingUserId,
-        timestamp: new Date(),
+        userId: userId,
+        userDetails: user,
+        message: `started following you.`,
       };
 
       const receiverSocketId = getReceiverSocketId(followingUserId);

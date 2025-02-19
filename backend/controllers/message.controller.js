@@ -44,7 +44,7 @@ export const sendMessage = async (req, res) => {
         type: "message",
         userId: senderId,
         userDetails: sender,
-        message: `You have a new message from ${sender.username}`,
+        message: `Sent you a message`,
         conversationId: conversation._id
       };
 

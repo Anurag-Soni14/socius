@@ -118,7 +118,7 @@ export const likePost = async (req, res) => {
         userId: likedUser,
         userDetails: user,
         postId,
-        message: `Your post was liked by ${likedUser}`,
+        message: `Liked your post`,
       };
 
       const postOwnerSocketId = getReceiverSocketId(postOwnerId);
@@ -167,8 +167,8 @@ export const dislikePost = async (req, res) => {
         userId: userId,
         userDetails: user,
         postId,
-        message: `Your post is was liked by ${userId}`
-      }
+        message: `Unliked your post`
+      };
       const postOwnerSocketId = getReceiverSocketId(postOwnerId);
       io.to(postOwnerSocketId).emit('notification', notification)
     }
@@ -194,6 +194,7 @@ export const addComment = async (req, res) => {
     const {text} = req.body;
 
     const post = await Post.findById(postId);
+    const user = await User.findById(userId);
 
     if (!text) {
       return res.status(400).json({
@@ -219,13 +220,21 @@ export const addComment = async (req, res) => {
 
     // ✅ Send real-time notification to post owner
     if (post.author._id.toString() !== userId) {
+      // const notification = {
+      //   type: "comment",
+      //   message: `${comment.author.username} commented on your post.`,
+      //   senderId: userId,
+      //   receiverId: post.author._id.toString(),
+      //   postId,
+      //   timestamp: new Date(),
+      // };
+
       const notification = {
         type: "comment",
-        message: `${comment.author.username} commented on your post.`,
-        senderId: userId,
-        receiverId: post.author._id.toString(),
+        userId: userId,
+        userDetails: user,
         postId,
-        timestamp: new Date(),
+        message: `commented on your post.`,
       };
 
       const receiverSocketId = getReceiverSocketId(post.author._id.toString());
