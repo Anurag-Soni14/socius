@@ -1,30 +1,45 @@
 import mongoose from "mongoose";
 import Conversation from "../models/conversation.model.js";
 import { Message } from "../models/message.model.js";
-import {User} from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
+import getDataUri from "../utils/data-uri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.id;
     const receiverId = req.params.id;
     const { textMessage: message } = req.body;
+    const image = req.file;
+
+    let imageUrl;
+    if (image) {
+      // Convert image buffer to Data URI
+      const fileUri = getDataUri(image);
+
+      // Upload to Cloudinary
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+      imageUrl = cloudResponse.secure_url;
+    }
 
     let conversation = await Conversation.findOne({
-      participants: { $all: [senderId, receiverId] }
+      participants: { $all: [senderId, receiverId] },
     });
 
     // Establish the conversation if not started yet.
     if (!conversation) {
       conversation = await Conversation.create({
-        participants: [senderId, receiverId]
+        participants: [senderId, receiverId],
       });
     }
 
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      message
+      message,
+      image: imageUrl,
     });
 
     if (newMessage) conversation.messages.push(newMessage._id);
@@ -37,7 +52,9 @@ export const sendMessage = async (req, res) => {
       io.to(receiverSocketId).emit("newMessage", newMessage);
 
       // Fetch sender details to include in notification
-      const sender = await User.findById(senderId).select("username profilePic");
+      const sender = await User.findById(senderId).select(
+        "username profilePic"
+      );
 
       // Construct notification object
       const notification = {
@@ -45,7 +62,7 @@ export const sendMessage = async (req, res) => {
         userId: senderId,
         userDetails: sender,
         message: `Sent you a message`,
-        conversationId: conversation._id
+        conversationId: conversation._id,
       };
 
       // Emit notification event
@@ -54,24 +71,23 @@ export const sendMessage = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      newMessage
+      newMessage,
     });
   } catch (error) {
     console.log("Error sending message:", error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong"
+      message: "Something went wrong",
     });
   }
 };
 
-
-
-
 export const getMessage = async (req, res) => {
   try {
     const senderId = mongoose.Types.ObjectId.createFromHexString(req.id);
-const receiverId = mongoose.Types.ObjectId.createFromHexString(req.params.id);
+    const receiverId = mongoose.Types.ObjectId.createFromHexString(
+      req.params.id
+    );
 
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] }, // ✅ Fix: Use an array instead of an object

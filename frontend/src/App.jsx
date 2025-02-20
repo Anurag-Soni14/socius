@@ -17,6 +17,7 @@ import { useSocket } from "./context/SocketContext";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import NotificationPage from "./Pages/NotificationPage";
 import { addNotification, setMessageNotification } from "./redux/rtnSlice";
+import SearchPage from "./Pages/SearchPage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -35,6 +36,7 @@ const browserRouter = createBrowserRouter([
       { path: "/account/settings/change-theme", element: <ChangeTheme /> },
       { path: "/message", element: <MessagePage /> },
       { path: "/notifications", element: <NotificationPage /> },
+      { path: "/search", element: <SearchPage /> },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -68,8 +70,6 @@ const App = () => {
         socket.off("notification");
         socket.disconnect();
       };
-    } else {
-      console.log("⚠️ Socket is NOT connected in App.jsx.");
     }
   }, [user, socket, dispatch]);
   

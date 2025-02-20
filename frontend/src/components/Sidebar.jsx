@@ -70,6 +70,8 @@ function Sidebar() {
     } else if (menu === "Notification") {
       navigate("/notifications");
       dispatch(markNotificationsAsSeen()); // Clear unseen notifications
+    } else if (menu === "Search") {
+      navigate("/search");
     }
   };
 
