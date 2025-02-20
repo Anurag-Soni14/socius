@@ -221,13 +221,21 @@ function Postframe({ post }) {
         )}
       </div>
 
-      <div className="mt-3">
-        <img
-          src={post.image}
-          alt="post"
-          className="w-full h-64 bg-base-200 rounded-lg"
-        />
-      </div>
+        {post.image && (
+          <div className="mt-3">
+          <img
+            src={post.image}
+            alt="post"
+            className="w-full h-64 bg-base-200 rounded-lg"
+          />
+        </div>)}
+      {/* // <div className="mt-3">
+      //   <img
+      //     src={post.image}
+      //     alt="post"
+      //     className="w-full h-64 bg-base-200 rounded-lg"
+      //   />
+      // </div> */}
 
       <div className="my-3 border-t border-base-300"></div>
 

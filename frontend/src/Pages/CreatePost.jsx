@@ -31,8 +31,12 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
       setImagePreview(dataUrl);
     }
   };
-  
+
   const createPostHandler = async (e) => {
+    if (!caption && !imagePreview) {
+      toast.info("You must add either text or an image to post!");
+      return;
+    }
     const formData = new FormData();
     formData.append("caption", caption);
     if (imagePreview) formData.append("image", file);
@@ -65,7 +69,10 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
 
   return (
     <Dialog open={openDialogForCreate}>
-      <DialogContent onInteractOutside={() => setOpenDialogForCreate(false)} className="bg-base-100 text-base-content">
+      <DialogContent
+        onInteractOutside={() => setOpenDialogForCreate(false)}
+        className="bg-base-100 text-base-content"
+      >
         <VisuallyHidden>
           <DialogTitle>Buttons</DialogTitle>
           <DialogDescription>a dialog to create the posts</DialogDescription>
@@ -79,7 +86,9 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="font-semibold text-xs text-base-content">{user?.username}</h1>
+            <h1 className="font-semibold text-xs text-base-content">
+              {user?.username}
+            </h1>
             <span className="text-gray-600 text-xs">bio...</span>
           </div>
         </div>
@@ -113,7 +122,7 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
           Select from computer
         </Button>
 
-        {imagePreview &&
+        {(imagePreview || caption.trim()) &&
           (loading ? (
             <Button className="bg-primary text-base-100">
               <Loader2 className="mr-2 size-4 animate-spin" /> Please Wait...

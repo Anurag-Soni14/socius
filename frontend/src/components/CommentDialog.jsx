@@ -50,7 +50,9 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
         setComments(updatedCommentData);
 
         const updatedPostData = posts.map((p) =>
-          p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
+          p._id === selectedPost._id
+            ? { ...p, comments: updatedCommentData }
+            : p
         );
 
         dispatch(setPosts(updatedPostData));
@@ -70,16 +72,31 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
       >
         <VisuallyHidden>
           <DialogTitle>Comments</DialogTitle>
-          <DialogDescription>User comments will be shown here</DialogDescription>
+          <DialogDescription>
+            User comments will be shown here
+          </DialogDescription>
         </VisuallyHidden>
         <div className="flex flex-1">
           <div className="w-1/2">
+            {selectedPost?.image ? (
+              <img
+                src={selectedPost?.image}
+                alt="post"
+                className="w-full h-full object-cover rounded-l-lg"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full p-4">
+                <p>{selectedPost?.caption}</p>
+              </div>
+            )}
+          </div>
+          {/* <div className="w-1/2">
             <img
               src={selectedPost?.image}
               alt="post"
               className="w-full h-full object-cover rounded-l-lg"
             />
-          </div>
+          </div> */}
           <div className="w-1/2 flex flex-col justify-between">
             <div className="flex items-center justify-between p-4">
               <div className="flex gap-3 items-center">
@@ -100,8 +117,12 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
                   <MoreHorizontal className="cursor-pointer text-base-content" />
                 </DialogTrigger>
                 <DialogContent className="flex flex-col items-center text-sm text-center bg-base-200 text-base-content">
-                  <button className="cursor-pointer w-full text-error">Unfollow</button>
-                  <button className="cursor-pointer w-full">Add to favorite</button>
+                  <button className="cursor-pointer w-full text-error">
+                    Unfollow
+                  </button>
+                  <button className="cursor-pointer w-full">
+                    Add to favorite
+                  </button>
                 </DialogContent>
               </Dialog>
             </div>

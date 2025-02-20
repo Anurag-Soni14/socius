@@ -6,27 +6,33 @@ import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
-
 export const addNewPost = async (req, res) => {
   try {
     const { caption } = req.body;
     const image = req.file;
     const authorId = req.id;
 
-    if (!image) {
-      return res.status(400).json({ message: "Please upload an image" });
+    if (!caption && !image) {
+      return res
+        .status(400)
+        .json({ message: "Post must contain at least an image or a caption" });
     }
 
-    // Convert image buffer to Data URI
-    const fileUri = getDataUri(image);
+    let imageUrl = "";
 
-    // Upload to Cloudinary
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    if (image) {
+      // Convert image buffer to Data URI
+      const fileUri = getDataUri(image);
+
+      // Upload to Cloudinary
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      imageUrl = cloudResponse.secure_url;
+    }
 
     // Save post to database
     const post = await Post.create({
       caption,
-      image: cloudResponse.secure_url,
+      image: imageUrl,
       author: authorId,
     });
 
@@ -104,7 +110,9 @@ export const likePost = async (req, res) => {
     const post = await Post.findById(postId);
 
     if (!post) {
-      return res.status(404).json({ message: "Post not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
     }
 
     await Post.updateOne({ _id: postId }, { $addToSet: { likes: likedUser } });
@@ -133,10 +141,11 @@ export const likePost = async (req, res) => {
     return res.status(200).json({ message: "Post liked", success: true });
   } catch (error) {
     console.error("Error liking post:", error);
-    return res.status(500).json({ message: "Something went wrong", success: false });
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", success: false });
   }
 };
-
 
 export const dislikePost = async (req, res) => {
   try {
@@ -152,25 +161,22 @@ export const dislikePost = async (req, res) => {
       });
     }
 
-    await Post.updateOne(
-      { _id: postId }, 
-      { $pull: { likes: userId } } 
-    );
+    await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
 
     // Implement socket.io for real-time notifications (if applicable)
-    const user = await User.findById(userId).select('username profilePic');
+    const user = await User.findById(userId).select("username profilePic");
     const postOwnerId = post.author.toString();
-    if(postOwnerId !== userId){
+    if (postOwnerId !== userId) {
       // emit a notification event
       const notification = {
-        type: 'dislike',
+        type: "dislike",
         userId: userId,
         userDetails: user,
         postId,
-        message: `Unliked your post`
+        message: `Unliked your post`,
       };
       const postOwnerSocketId = getReceiverSocketId(postOwnerId);
-      io.to(postOwnerSocketId).emit('notification', notification)
+      io.to(postOwnerSocketId).emit("notification", notification);
     }
     return res.status(200).json({
       message: "Post unliked",
@@ -186,12 +192,11 @@ export const dislikePost = async (req, res) => {
   }
 };
 
-
 export const addComment = async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.id;
-    const {text} = req.body;
+    const { text } = req.body;
 
     const post = await Post.findById(postId);
     const user = await User.findById(userId);
@@ -207,7 +212,7 @@ export const addComment = async (req, res) => {
       text,
       author: userId,
       post: postId,
-    })
+    });
 
     await comment.populate({
       path: "author",
@@ -258,7 +263,11 @@ export const getCommentOfPost = async (req, res) => {
   try {
     const postId = req.params.id;
 
-    const comments = await Comment.find({ post: postId }).populate( 'author', 'username', 'profilePic');
+    const comments = await Comment.find({ post: postId }).populate(
+      "author",
+      "username",
+      "profilePic"
+    );
 
     if (!comments) {
       return res.status(404).json({
@@ -327,33 +336,33 @@ export const savedPost = async (req, res) => {
 
     const post = await Post.findById(postId);
 
-    if(!post){
+    if (!post) {
       return res.status(404).json({
-        message: 'post not found',
-        success: false
-      })
+        message: "post not found",
+        success: false,
+      });
     }
 
     const user = await User.findById(autherId);
 
-    if(user.saved.includes(post._id)){
+    if (user.saved.includes(post._id)) {
       // if the post is already saved then remove is from the model
-      await user.updateOne({$pull:{saved: post._id}});
+      await user.updateOne({ $pull: { saved: post._id } });
       await user.save();
       return res.status(200).json({
-        type: 'unsaved',
-        message: 'post removed from bookmark',
-        success: true
-      })
-    }else{
+        type: "unsaved",
+        message: "post removed from bookmark",
+        success: true,
+      });
+    } else {
       // if the post is not saved then save it to the user model
-      await user.updateOne({$addToSet:{saved: post._id}});
+      await user.updateOne({ $addToSet: { saved: post._id } });
       await user.save();
       return res.status(200).json({
-        type: 'saved',
-        message: 'post added to saved',
-        success: true
-      })
+        type: "saved",
+        message: "post added to saved",
+        success: true,
+      });
     }
   } catch (error) {
     console.log(error);

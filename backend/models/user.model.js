@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
     liked: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     saved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
 
     interests: [{ type: String }], // Array of interests (e.g., "Technology", "Music")
     joinedAt: { type: Date, default: Date.now },
