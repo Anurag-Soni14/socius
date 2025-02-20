@@ -10,7 +10,7 @@ function Home() {
   useGetSuggestedUsers();
 
   return (
-    <div className="flex bg-base-100 text-base-content">
+    <div className="flex bg-base-100 text-base-content w-full">
       <div className="flex-grow">
         <Feed />
         <Outlet />

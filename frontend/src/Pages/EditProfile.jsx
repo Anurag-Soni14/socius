@@ -186,7 +186,7 @@ const EditProfile = () => {
             name="gender"
             value={input.gender}
             onChange={inputChangeHandler}
-            className="select select-bordered w-full"
+            className="select select-bordered w-full bg-white"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>

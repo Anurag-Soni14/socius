@@ -95,7 +95,7 @@ function Sidebar() {
   ];
 
   return (
-    <div className="fixed top-0 left-0 z-10 w-[16%] h-screen border-r border-base-300 bg-base-100 text-base-content px-4">
+    <div className="fixed top-0 left-0 z-10 w-[14%] h-screen border-r border-base-300 bg-base-100 text-base-content pl-4">
       <div className="flex flex-col h-full">
         <h1 className="my-8 pl-3 font-bold text-xl text-base-content">Logo</h1>
         <div className="flex-grow">
@@ -199,6 +199,7 @@ function Sidebar() {
           ))}
         </div>
       </div>
+      <CreatePost openDialogForCreate={openDialogForCreate} setOpenDialogForCreate={setOpenDialogForCreate}/>
     </div>
   );
 }

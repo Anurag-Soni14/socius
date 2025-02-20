@@ -22,9 +22,9 @@ function NotificationPage() {
   };
 
   return (
-    <div className="pl-[20%] p-6">
+    <div className="pt-6 ml-[16%]">
       <div className="flex justify-between items-center mb-6 border-b pb-3">
-        <h2 className="text-xl font-semibold">🔔 Notifications</h2>
+        <h2 className="text-xl font-semibold pl-3">🔔 Notifications</h2>
         {notificationHistory?.length > 0 && (
           <Button
             onClick={handleClearNotifications}

@@ -111,11 +111,11 @@ const MessagePage = () => {
   },[messages]);
 
   return (
-    <div className="flex ml-[16%] h-full">
-      <div className="h-screen bg-base-200">
-        <div className="flex items-center justify-center pt-20 px-4">
-          <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
-            <div className="flex h-full rounded-lg overflow-hidden">
+    <div className="flex h-full ml-[16%]">
+      <div className="h-screen bg-base-200 flex-grow">
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="bg-base-100 rounded-lg shadow-cl w-full h-full flex">
+            <div className="flex h-full w-full rounded-lg overflow-hidden">
               <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
                 <div className="border-b border-base-300 w-full p-5">
                   <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ const MessagePage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 flex flex-col overflow-auto">
+                <div className="flex-1 flex flex-col overflow-auto w-full">
                   <div className="p-2.5 border-b border-base-300">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -240,7 +240,7 @@ const MessagePage = () => {
                       </div>
 
                       {/* Close button */}
-                      <button onClick={() => setSelectedUser(null)}>
+                      <button onClick={() => dispatch(setSelectedUser(null))}>
                         <X />
                       </button>
                     </div>
@@ -268,7 +268,7 @@ const MessagePage = () => {
                             {formatMessageTime(message.createdAt)}
                           </time>
                         </div>
-                        <div className="chat-bubble flex flex-col">
+                        <div className={`chat-bubble flex flex-col ${message.senderId === user._id ? "bg-primary text-primary-content" : "bg-base-200 text-base-content"} p-2 rounded-lg`}>
                           {message.image && (
                             <img
                               src={message.image}
@@ -337,7 +337,7 @@ const MessagePage = () => {
                       </div>
                       <button
                         type="submit"
-                        className="btn btn-sm btn-circle"
+                        className="btn btn-circle"
                         disabled={!textMessage.trim() && !imagePreview}
                       >
                         <Send size={22} />

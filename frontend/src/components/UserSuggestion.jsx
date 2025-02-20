@@ -8,7 +8,7 @@ import UserInfo from "./UserInfo";
 function UserSuggestion() {
   const { user } = useSelector((store) => store.auth);
   return (
-    <div className="w-fit h-screen my-10 pr-4 bg-base-100 text-base-content">
+    <div className="w-fit h-screen my-10 bg-base-100 text-base-content">
       <UserInfo />
       <SuggestedUsers />
     </div>
