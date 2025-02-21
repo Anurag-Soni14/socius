@@ -1,9 +1,9 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
-function Comment({ comment }) {
+function Comment({ comment, isLast}) {
   return (
-    <div className='my-2'>
+    <div className='my-2' id={isLast ? "comment-end" : undefined}>
       <div className='flex gap-3 items-center'>
         <Avatar>
           <AvatarImage src={comment?.author?.profilePic} />

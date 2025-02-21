@@ -116,6 +116,7 @@ export const likePost = async (req, res) => {
     }
 
     await Post.updateOne({ _id: postId }, { $addToSet: { likes: likedUser } });
+    await User.updateOne({ _id: likedUser }, { $addToSet: { liked: postId } });
 
     const user = await User.findById(likedUser).select("username profilePic");
     const postOwnerId = post.author.toString();
@@ -130,8 +131,6 @@ export const likePost = async (req, res) => {
       };
 
       const postOwnerSocketId = getReceiverSocketId(postOwnerId);
-      console.log("🔗 Backend socket instance:", io);
-      console.log("📨 Sending notification to:", postOwnerSocketId);
 
       if (postOwnerSocketId) {
         io.to(postOwnerSocketId).emit("notification", notification);
@@ -162,6 +161,8 @@ export const dislikePost = async (req, res) => {
     }
 
     await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
+    await User.updateOne({ _id: userId }, { $pull: { liked: postId } });
+
 
     // Implement socket.io for real-time notifications (if applicable)
     const user = await User.findById(userId).select("username profilePic");
@@ -222,6 +223,8 @@ export const addComment = async (req, res) => {
     post.comments.push(comment._id);
 
     await post.save();
+    await User.updateOne({ _id: userId }, { $addToSet: { comments: postId } });
+
 
     // ✅ Send real-time notification to post owner
     if (post.author._id.toString() !== userId) {

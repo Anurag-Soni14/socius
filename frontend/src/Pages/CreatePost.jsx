@@ -9,7 +9,8 @@ import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { use } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -66,6 +67,13 @@ function CreatePost({ openDialogForCreate, setOpenDialogForCreate }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (openDialogForCreate) {
+      setCaption("");
+      setImagePreview("");
+    }
+  }, [openDialogForCreate]);
 
   return (
     <Dialog open={openDialogForCreate}>

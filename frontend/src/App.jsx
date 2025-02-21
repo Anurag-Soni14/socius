@@ -18,6 +18,11 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import NotificationPage from "./Pages/NotificationPage";
 import { addNotification, setMessageNotification } from "./redux/rtnSlice";
 import SearchPage from "./Pages/SearchPage";
+import PersonalInfo from "./Pages/PersonalInfo";
+import HelpPage from "./Pages/HelpPage";
+import AboutUs from "./Pages/AboutUs";
+import ContactUs from "./Pages/ContactUs";
+import ReportPage from "./Pages/ReportPage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -37,6 +42,11 @@ const browserRouter = createBrowserRouter([
       { path: "/message", element: <MessagePage /> },
       { path: "/notifications", element: <NotificationPage /> },
       { path: "/search", element: <SearchPage /> },
+      { path: "/account/personal-info", element: <PersonalInfo /> },
+      { path: "/account/help", element: <HelpPage /> },
+      { path: "/about-us", element: <AboutUs /> },
+      { path: "/contact-us", element: <ContactUs /> },
+      { path: "/account/report", element: <ReportPage /> },
     ],
   },
   { path: "/login", element: <Login /> },

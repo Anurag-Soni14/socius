@@ -61,13 +61,13 @@ const SearchPage = () => {
 
       {error && <p className="mt-4 text-center text-red-500">{error}</p>}
 
-      <div className="mt-4 bg-white rounded-lg shadow-md">
+      <div className="mt-4 rounded-lg shadow-md">
         {users.length > 0 ? (
           users.map((user) => (
             <Link
               key={user._id}
               to={`/profile/${user._id}`}
-              className="flex items-center gap-3 p-3 hover:bg-gray-100 transition-all border-b"
+              className="flex items-center gap-3 p-3 hover:bg-base-300 bg-base-200 transition-all rounded-lg"
             >
               <Avatar className="size-10">
                 <AvatarImage src={user.profilePic} />

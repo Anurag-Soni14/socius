@@ -38,7 +38,7 @@ function NotificationPage() {
       {notificationHistory?.length > 0 ? (
         <div className="space-y-4">
           {notificationHistory.map((notification, index) => (
-            <div key={index} className="flex items-center gap-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
+            <div key={index} className="flex items-center gap-4 p-4 bg-base-200 rounded-lg shadow">
               {/* User Avatar */}
               <Avatar className="w-10 h-10">
                 <AvatarImage src={notification?.userDetails?.profilePic} />
@@ -46,8 +46,8 @@ function NotificationPage() {
               </Avatar>
 
               {/* Notification Message */}
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                <strong className="text-gray-900 dark:text-white">{notification?.userDetails?.username}</strong> {notification?.message}
+              <p className="text-sm text-base-content">
+                <strong className="text-base-content">{notification?.userDetails?.username}</strong> {notification?.message}
               </p>
             </div>
           ))}

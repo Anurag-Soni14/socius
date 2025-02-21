@@ -105,7 +105,7 @@ const Profile = () => {
       <div className="relative h-52 bg-gray-200">
         {userProfile?.coverPhoto ? (
           <img
-            src={userProfile.coverPhoto}
+            src={userProfile?.coverPhoto}
             alt="Cover"
             className="w-full h-full object-cover"
           />
@@ -236,13 +236,24 @@ const Profile = () => {
           displayPosts?.map((post, index) => (
             <div
               key={index}
-              className="relative group cursor-pointer rounded-lg overflow-hidden"
+              className="relative group cursor-pointer rounded-lg overflow-hidden border-2"
             >
-              <img
+              {post?.image? (
+                <img
                 src={post?.image}
                 alt="Post"
                 className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
               />
+              ):(
+                <div className="w-full h-40 flex justify-center items-center px-3 object-cover transition-transform duration-300 group-hover:scale-105">
+                  <p>{post?.caption}</p>
+                </div>
+              )}
+              {/* <img
+                src={post?.image}
+                alt="Post"
+                className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+              /> */}
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="flex items-center text-white space-x-4">
                   <button className="flex items-center gap-2 hover:text-gray-300">

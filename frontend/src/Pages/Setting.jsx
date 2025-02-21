@@ -5,13 +5,12 @@ const Setting = () => {
   const navigate = useNavigate();
 
   const settings = [
-    { category: "Profile", options: [{ name: "Edit Profile", path: "/account/settings/edit-profile" }, { name: "Personal Info", path: "/personal-info" }, { name: "Change Theme", path: "/account/settings/change-theme" }] },
+    { category: "Profile", options: [{ name: "Edit Profile", path: "/account/settings/edit-profile" }, { name: "Personal Info", path: "/account/personal-info" }, { name: "Change Theme", path: "/account/settings/change-theme" }] },
     { category: "Manage", options: [{ name: "Liked", path: "/liked" }, { name: "Comments", path: "/comments" }, { name: "Saved", path: "/saved" }, { name: "Delete Account", path: "/delete-account" }] },
     { category: "Privacy", options: [{ name: "Blocked Users", path: "/blocked-users" }, { name: "Activity Status", path: "/activity-status" }, { name: "Who Can Message You", path: "/message-privacy" }] },
     { category: "Notifications", options: [{ name: "Push Notifications", path: "/push-notifications" }, { name: "Email Alerts", path: "/email-alerts" }, { name: "SMS Notifications", path: "/sms-notifications" }] },
     { category: "Security", options: [{ name: "Change Password", path: "/change-password" }, { name: "Two-Factor Authentication", path: "/2fa" }, { name: "Login Activity", path: "/login-activity" }] },
-    { category: "Preferences", options: [{ name: "Language", path: "/language" }, { name: "Content Preferences", path: "/content-preferences" }, { name: "Data Usage", path: "/data-usage" }] },
-    { category: "Other", options: [{ name: "Help", path: "/help" }, { name: "About Us", path: "/about-us" }, { name: "Contact Us", path: "/contact-us" }, { name: "Report", path: "/report" }] },
+    { category: "Other", options: [{ name: "Help", path: "/account/help" }, { name: "About Us", path: "/about-us" }, { name: "Contact Us", path: "/contact-us" }, { name: "Report", path: "/account/report" }] },
   ];
 
   const handleNavigation = (path) => {

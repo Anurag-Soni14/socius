@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setAuthUser } from "@/redux/authSlice";
+import { setAuthUser, setSuggestedUsers } from "@/redux/authSlice";
 import CreatePost from "@/Pages/CreatePost";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -44,6 +44,7 @@ function Sidebar() {
       if (res.data.success) {
         dispatch(setAuthUser(null));
         dispatch(setSelectedPost(null));
+        dispatch(setSuggestedUsers(null));
         dispatch(setPosts([]));
         navigate("/login");
         toast.success(res.data.message);

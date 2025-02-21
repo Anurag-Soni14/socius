@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
   const [text, setText] = useState("");
   const { selectedPost, posts } = useSelector((store) => store.posts);
   const [comments, setComments] = useState([]);
+  const commentEndRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -63,6 +64,15 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (showCommentDialog) {
+      setTimeout(() => {
+        const commentEnd = document.getElementById("comment-end");
+        commentEnd?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 100); // Small delay ensures React renders first
+    }
+  }, [comments.length, showCommentDialog]);
 
   return (
     <Dialog open={showCommentDialog}>
@@ -128,8 +138,12 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
             </div>
             <hr className="border-base-300" />
             <div className="flex-1 overflow-y-auto max-h-96 p-4">
-              {comments.map((comment) => (
-                <Comment key={comment._id} comment={comment} />
+              {comments.map((comment, index) => (
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  isLast={index === comments.length - 1}
+                />
               ))}
             </div>
             <div className="p-4">
