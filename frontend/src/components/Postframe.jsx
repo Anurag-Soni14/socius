@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 import { MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import { FaHeart, FaRegHeart, FaBookmark, FaRegBookmark } from "react-icons/fa";
@@ -73,8 +79,28 @@ function Postframe({ post }) {
     }
   };
 
+  const formatPostAge = (createdAt) => {
+    const postDate = new Date(createdAt);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - postDate) / 1000);
+  
+    if (diffInSeconds < 60) return `${diffInSeconds} Sec`;
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes} Min`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} Hour`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) return `${diffInDays} D`;
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) return `${diffInMonths} M`;
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears} Y`;
+  };
+  
+
   return (
     <div className="max-w-lg mx-auto my-6 border border-base-300 rounded-xl shadow-lg bg-base-100 p-5">
+      {/* Post Header */}
       {/* Post Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -88,33 +114,42 @@ function Postframe({ post }) {
             <p className="font-semibold text-base-content">
               {post.author?.username}
             </p>
-            {user?._id === post?.author?._id && (
-              <Badge variant="secondary">Author</Badge>
-            )}
+            <p className="text-sm text-base-content/70">
+              {formatPostAge(post.createdAt)}
+            </p>
           </div>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <MoreHorizontal className="cursor-pointer text-base-content/70 hover:text-primary" />
-          </DialogTrigger>
-          <DialogContent className="text-sm text-center bg-base-100 flex flex-col items-center space-y-2">
-            <VisuallyHidden>
-              <DialogTitle>Buttons</DialogTitle>
-              <DialogDescription>Post related buttons</DialogDescription>
-            </VisuallyHidden>
-            <Button variant="ghost" className="text-error font-bold">
-              Unfollow
-            </Button>
-            <Button variant="ghost" onClick={() => console.log("Saved")}>
-              {isSaved ? "Unsave" : "Save"}
-            </Button>
-            {user && post?.author?._id === user._id && (
-              <Button variant="ghost" className="text-error">
-                Delete
+        <div className="flex items-center gap-2">
+          {user?._id === post?.author?._id && (
+            <Badge variant="secondary">Author</Badge>
+          )}
+          <Dialog>
+            <DialogTrigger asChild>
+              <MoreHorizontal className="cursor-pointer text-base-content/70 hover:text-primary" />
+            </DialogTrigger>
+            <DialogContent className="text-sm text-center bg-base-100 flex flex-col items-center space-y-2">
+              <VisuallyHidden>
+                <DialogTitle>Buttons</DialogTitle>
+                <DialogDescription>Post related buttons</DialogDescription>
+              </VisuallyHidden>
+              {user && post?.author?._id !== user._id && (
+                <Button variant="ghost" className="text-error font-bold">
+                  {user?.followings?.includes(post?.author?._id)
+                    ? "Unfollow"
+                    : "Follow"}
+                </Button>
+              )}
+              <Button variant="ghost" onClick={() => console.log("Saved")}>
+                {isSaved ? "Unsave" : "Save"}
               </Button>
-            )}
-          </DialogContent>
-        </Dialog>
+              {user && post?.author?._id === user._id && (
+                <Button variant="ghost" className="text-error">
+                  Delete
+                </Button>
+              )}
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Caption */}
@@ -139,11 +174,11 @@ function Postframe({ post }) {
 
       {/* Post Image */}
       {post.image && (
-        <div className="mt-3 rounded-xl overflow-hidden shadow-sm">
+        <div className="mt-3 bg-base-200 rounded-lg overflow-hidden shadow-sm">
           <img
             src={post.image}
             alt="Post"
-            className="w-full h-72 object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
@@ -159,7 +194,10 @@ function Postframe({ post }) {
         </button>
         <button
           className="flex items-center gap-2 hover:text-primary"
-          onClick={() => setShowCommentDialog(true)}
+          onClick={() => {
+            dispatch(setSelectedPost(post));
+            setShowCommentDialog(true);
+          }}
         >
           <MessageCircle /> {comments.length}
         </button>
