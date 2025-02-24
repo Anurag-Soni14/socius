@@ -6,7 +6,7 @@ const Setting = () => {
 
   const settings = [
     { category: "Profile", options: [{ name: "Edit Profile", path: "/account/settings/edit-profile" }, { name: "Personal Info", path: "/account/personal-info" }, { name: "Change Theme", path: "/account/settings/change-theme" }] },
-    { category: "Manage", options: [{ name: "Liked", path: "/liked" }, { name: "Comments", path: "/comments" }, { name: "Saved", path: "/saved" }, { name: "Delete Account", path: "/delete-account" }] },
+    { category: "Manage", options: [{ name: "Liked", path: "/account/liked-post" }, { name: "Comments", path: "/account/commented-post" }, { name: "Saved", path: "/saved" }, { name: "Delete Account", path: "/delete-account" }] },
     { category: "Privacy", options: [{ name: "Blocked Users", path: "/blocked-users" }, { name: "Activity Status", path: "/activity-status" }, { name: "Who Can Message You", path: "/message-privacy" }] },
     { category: "Notifications", options: [{ name: "Push Notifications", path: "/push-notifications" }, { name: "Email Alerts", path: "/email-alerts" }, { name: "SMS Notifications", path: "/sms-notifications" }] },
     { category: "Security", options: [{ name: "Change Password", path: "/change-password" }, { name: "Two-Factor Authentication", path: "/2fa" }, { name: "Login Activity", path: "/login-activity" }] },

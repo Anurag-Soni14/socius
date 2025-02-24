@@ -23,6 +23,8 @@ import HelpPage from "./Pages/HelpPage";
 import AboutUs from "./Pages/AboutUs";
 import ContactUs from "./Pages/ContactUs";
 import ReportPage from "./Pages/ReportPage";
+import LikedPostsPage from "./Pages/LikedPostsPage";
+import CommentedPostsPage from "./Pages/CommentedPostsPage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -47,6 +49,8 @@ const browserRouter = createBrowserRouter([
       { path: "/about-us", element: <AboutUs /> },
       { path: "/contact-us", element: <ContactUs /> },
       { path: "/account/report", element: <ReportPage /> },
+      { path: "/account/liked-post", element: <LikedPostsPage /> },
+      { path: "/account/commented-post", element: <CommentedPostsPage /> },
     ],
   },
   { path: "/login", element: <Login /> },

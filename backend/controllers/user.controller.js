@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
+import { Contact } from "../models/contact-model.js";
+import { Report } from "../models/report.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const register = async (req, res) => {
@@ -356,6 +358,64 @@ export const followOrUnfollow = async (req, res) => {
       message: "An error occurred while processing your request",
       error: error.message,
       success: false
+    });
+  }
+};
+
+
+export const submitContactForm = async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false, message: "All required fields must be filled." });
+    }
+
+    const newContact = new Contact({ name, email, subject, message });
+    await newContact.save();
+
+    res.status(201).json({ success: true, message: "Message sent successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later." });
+  }
+};
+
+export const submitReport = async (req, res) => {
+  try {
+    const { reportType, description } = req.body;
+    const image = req.file;
+    const userId = req.id;
+
+    if (!reportType || !description) {
+      return res.status(400).json({ message: "Report must contain a type and description" });
+    }
+
+    let imageUrl = "";
+    if (image) {
+      const fileUri = getDataUri(image);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      imageUrl = cloudResponse.secure_url;
+    }
+
+    const report = await Report.create({
+      reportType,
+      description,
+      image: imageUrl,
+      user: userId,
+    });
+
+    return res.status(201).json({
+      message: "Report submitted successfully",
+      report,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in addNewReport:", error);
+    return res.status(500).json({
+      message: "Something went wrong while submitting the report.",
+      error: error.message,
+      success: false,
     });
   }
 };

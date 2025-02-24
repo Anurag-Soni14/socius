@@ -13,10 +13,12 @@ import { useSocket } from "@/context/SocketContext"; // Assuming you have this c
 import { formatMessageTime, readFileAsDataURL } from "@/lib/utils";
 import useGetAllMessages from "@/hooks/useGetAllMessages";
 import useGetRTM from "@/hooks/useGetRTM";
+import { useNavigate } from "react-router-dom";
 
 const MessagePage = () => {
   useGetAllMessages();
   useGetRTM();
+  const navigate = useNavigate();
   const [textMessage, setTextMessage] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [file, setFile] = useState("");
@@ -217,7 +219,7 @@ const MessagePage = () => {
                 <div className="flex-1 flex flex-col overflow-auto w-full">
                   <div className="p-2.5 border-b border-base-300">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${selectedUser._id}`)}>
                         {/* Avatar */}
                         <div className="avatar">
                           <Avatar className="size-10">
