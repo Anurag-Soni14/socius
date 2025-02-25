@@ -67,7 +67,7 @@ const SearchPage = () => {
             <Link
               key={user._id}
               to={`/profile/${user._id}`}
-              className="flex items-center gap-3 p-3 hover:bg-base-300 bg-base-200 transition-all rounded-lg"
+              className="flex items-center gap-3 m-1 p-3 hover:bg-base-300 bg-base-200 transition-all rounded-lg "
             >
               <Avatar className="size-10">
                 <AvatarImage src={user.profilePic} />

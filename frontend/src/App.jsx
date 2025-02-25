@@ -25,6 +25,7 @@ import ContactUs from "./Pages/ContactUs";
 import ReportPage from "./Pages/ReportPage";
 import LikedPostsPage from "./Pages/LikedPostsPage";
 import CommentedPostsPage from "./Pages/CommentedPostsPage";
+import FollowersFollowingPage from "./Pages/FollowersFollowingPage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ const browserRouter = createBrowserRouter([
       { path: "/account/report", element: <ReportPage /> },
       { path: "/account/liked-post", element: <LikedPostsPage /> },
       { path: "/account/commented-post", element: <CommentedPostsPage /> },
+      { path: "/profile/:id/followers-following", element: <FollowersFollowingPage /> },
     ],
   },
   { path: "/login", element: <Login /> },

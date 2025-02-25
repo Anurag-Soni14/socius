@@ -10,7 +10,7 @@ const CommentedPostsPage = () => {
 
   // Filter posts where the user has commented
   const commentedPosts = posts.filter((post) => {
-    return post.comments.map((comment) => comment);
+    return post.comments.map((comment) => comment.author._id === user?._id).includes(true);
     // return comments.includes(user?._id);
   })
   console.log(commentedPosts);

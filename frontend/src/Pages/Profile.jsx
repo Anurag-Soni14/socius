@@ -21,7 +21,7 @@ const Profile = () => {
   const params = useParams();
   const navigate = useNavigate();
   const userId = params.id;
-  useGetUserProfile(userId);
+  const { loading, error } = useGetUserProfile(userId)
   useGetUser();
   const [isLoading, setIsLoading] = useState(false);
   const { userProfile, user } = useSelector((store) => store.auth);
@@ -33,6 +33,7 @@ const Profile = () => {
     }
   }, [user, userProfile]);
 
+  
   const [userProfileFollowers, setUserProfileFollowers] = useState(
     userProfile?.followers?.length
   );
@@ -101,6 +102,8 @@ const Profile = () => {
 
   return (
     <div className="max-w-5xl mx-auto bg-base-100 shadow-lg rounded-lg overflow-hidden h-full mt-1">
+      {loading && <p>Loading profile...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {/* Cover Photo */}
       <div className="relative h-52 bg-gray-200">
         {userProfile?.coverPhoto ? (
@@ -161,10 +164,7 @@ const Profile = () => {
           {/* Follow & Message Buttons */}
           {!isLoggedInUserProfile && (
             <div className="flex gap-4 mt-4">
-              <Button
-                onClick={handleFollowAndUnfollow}
-                className="px-4 py-2"
-              >
+              <Button onClick={handleFollowAndUnfollow} className="px-4 py-2">
                 {isLoading ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : (
@@ -183,9 +183,15 @@ const Profile = () => {
         </div>
 
         {/* Followers & Following Stats */}
-        <div className="flex justify-start gap-8 mt-6 text-sm text-gray-700">
+        <div
+          className="flex justify-start gap-8 mt-6 text-sm text-gray-700 cursor-pointer"
+          onClick={() =>
+            navigate(`/profile/${userProfile?._id}/followers-following`)
+          }
+        >
           <div>
-            <span className="font-bold">{userProfile?.followers.length}</span> Followers
+            <span className="font-bold">{userProfile?.followers.length}</span>{" "}
+            Followers
           </div>
           <div>
             <span className="font-bold">{userProfile?.followings?.length}</span>{" "}
@@ -238,13 +244,13 @@ const Profile = () => {
               key={index}
               className="relative group cursor-pointer rounded-lg overflow-hidden border-2"
             >
-              {post?.image? (
+              {post?.image ? (
                 <img
-                src={post?.image}
-                alt="Post"
-                className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              ):(
+                  src={post?.image}
+                  alt="Post"
+                  className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
                 <div className="w-full h-40 flex justify-center items-center px-3 object-cover transition-transform duration-300 group-hover:scale-105">
                   <p>{post?.caption}</p>
                 </div>

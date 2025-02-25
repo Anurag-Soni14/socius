@@ -25,7 +25,7 @@ function Postframe({ post }) {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.posts);
-  useGetUserProfile(user?._id);
+  // useGetUserProfile(user?._id);
   const { userProfile } = useSelector((store) => store.auth);
 
   const [showFullCaption, setShowFullCaption] = useState(false);
