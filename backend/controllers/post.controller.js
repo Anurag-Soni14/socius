@@ -371,3 +371,47 @@ export const savedPost = async (req, res) => {
     console.log(error);
   }
 };
+
+
+export const getPostStats = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1); // Start of tomorrow
+
+    // **1. Total Posts**
+    const totalPosts = await Post.countDocuments();
+
+    // **2. New Posts (created today)**
+    const newPosts = await Post.countDocuments({
+      createdAt: { $gte: today, $lt: tomorrow },
+    });
+
+    // **3. Total Comments**
+    const totalComments = await Comment.countDocuments();
+
+    // **4. New Comments (created today)**
+    const newComments = await Comment.countDocuments({
+      createdAt: { $gte: today, $lt: tomorrow },
+    });
+
+    const stats = {
+      totalPosts,
+      newPosts,
+      totalComments,
+      newComments,
+    };
+    res.status(200).json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    console.error("Error fetching post stats:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch post stats",
+      error: error.message,
+    });
+  }
+};

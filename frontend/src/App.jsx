@@ -26,6 +26,11 @@ import ReportPage from "./Pages/ReportPage";
 import LikedPostsPage from "./Pages/LikedPostsPage";
 import CommentedPostsPage from "./Pages/CommentedPostsPage";
 import FollowersFollowingPage from "./Pages/FollowersFollowingPage";
+import AdminLayout from "./Pages/AdminLayout ";
+import AdminProtectedRoutes from "./components/AdminProtectedRoutes";
+import AdminDashboard from "./Pages/AdminDashboard";
+import UserManagement from "./Pages/UserManagement";
+import PostManagement from "./Pages/PostManagement";
 
 const browserRouter = createBrowserRouter([
   {
@@ -57,6 +62,22 @@ const browserRouter = createBrowserRouter([
   },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+
+  {
+    path: "/admin",
+    element: (
+      <AdminProtectedRoutes>
+        <AdminLayout />
+      </AdminProtectedRoutes>
+    ),
+    children: [
+      { path: "/admin", element: <AdminDashboard /> },
+      { path: "/admin/users", element: <UserManagement /> },
+      { path: "/admin/posts", element: <PostManagement /> },
+      // { path: "/admin/reports", element: <ReportManagement /> },
+      // { path: "/admin/contact-us", element: <ContactUsManagement /> },
+    ],
+  },
 ]);
 
 const App = () => {

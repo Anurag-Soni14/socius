@@ -26,7 +26,8 @@ const userSchema = new mongoose.Schema(
     // Privacy & Security
     isPrivate: { type: Boolean, default: false }, // If true, only approved followers can see posts
     blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    
+    isAdmin: { type: Boolean, default: false },
+    lastLogin: { type: Date, default: null }
   },
   { timestamps: true }
 );

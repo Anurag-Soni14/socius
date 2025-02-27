@@ -5,8 +5,11 @@ import { useSelector } from 'react-redux';
 
 const UserInfo = () => {
   const { user } = useSelector((store) => store.auth);
+
   return (
-    <div className="flex items-center gap-2 p-3 hover:bg-base-200 rounded-md">
+    <div className="flex items-center justify-between p-3 hover:bg-base-200 rounded-md">
+      {/* User Info */}
+      <div className="flex items-center gap-2">
         <Link to={`/profile/${user?._id}`}>
           <Avatar className="size-10">
             <AvatarImage src={user?.profilePic} />
@@ -21,6 +24,16 @@ const UserInfo = () => {
           </p>
         </div>
       </div>
+
+      {/* Admin Button (Only visible for admins) */}
+      {user?.isAdmin && (
+        <Link to="/admin">
+          <button className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary/80 transition-all">
+            Admin Panel
+          </button>
+        </Link>
+      )}
+    </div>
   );
 };
 

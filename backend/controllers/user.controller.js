@@ -1,4 +1,4 @@
-import {User} from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/data-uri.js";
@@ -68,26 +68,31 @@ export const login = async (req, res) => {
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-    if(!isPasswordCorrect){
-        return res.status(201).json({
-            message: "invalid credentials",
-            success: false,
-          });
+    if (!isPasswordCorrect) {
+      return res.status(201).json({
+        message: "invalid credentials",
+        success: false,
+      });
     }
 
-    const token = jwt.sign({userId: user._id}, process.env.SECRET_KEY,{expiresIn: '7d'});
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+      expiresIn: "7d",
+    });
 
     // populate each post id in the post array
     const populatedPosts = await Promise.all(
-      user.posts.map( async (postId) => {
-          const post = await Post.findById(postId);
-          if(post.author.equals(user._id)){
-              return post;
-          }
-          return null;
+      user.posts.map(async (postId) => {
+        const post = await Post.findById(postId);
+        if (post.author.equals(user._id)) {
+          return post;
+        }
+        return null;
       })
-  )
-    
+    );
+
     user = {
       _id: user._id,
       username: user.username,
@@ -107,65 +112,94 @@ export const login = async (req, res) => {
       interests: user.interests,
       joinedAt: user.joinedAt,
       isPrivate: user.isPrivate,
-      blockedUsers: user.blockedUsers
-    }
+      blockedUsers: user.blockedUsers,
+      isAdmin: user.isAdmin,
+    };
 
-    return res.cookie('token', token, {httpOnly: true, sameSite: 'strict', maxAge: 7*24*60*60*1000}).json({
-      message: `Welcome Back! ${user.username}`,
-      success: true,
-      user
-    })
+    return res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        message: `Welcome Back! ${user.username}`,
+        success: true,
+        user,
+      });
   } catch (error) {
     console.log(error);
   }
 };
 
-
-export const logout = async (req, res)=>{
+export const logout = async (req, res) => {
   try {
-    return res.cookie('token', "", {maxAge: 0}).json({
+    return res.cookie("token", "", { maxAge: 0 }).json({
       message: "logged out successfully",
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-export const getProfile = async (req, res)=>{
+export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    let user = await User.findById(userId).populate({path:'posts', createdAt:-1}).populate('saved').populate('liked').populate('comments').populate('followers').populate('followings').select('-password');
+    let user = await User.findById(userId)
+      .populate({ path: "posts", createdAt: -1 })
+      .populate("saved")
+      .populate("liked")
+      .populate("comments")
+      .populate("followers")
+      .populate("followings")
+      .select("-password");
     return res.status(200).json({
       user,
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-export const getUser = async (req, res)=>{
+export const getUser = async (req, res) => {
   try {
     const userId = req.id;
-    let user = await User.findById(userId).populate({path:'posts', createdAt:-1}).populate('saved').populate('followers').populate('followings').select('-password');
+    let user = await User.findById(userId)
+      .populate({ path: "posts", createdAt: -1 })
+      .populate("saved")
+      .populate("followers")
+      .populate("followings")
+      .select("-password");
     return res.status(200).json({
       user,
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-
+};
 
 export const editProfile = async (req, res) => {
   try {
     const userId = req.id;
-    const { username, fullname, email, bio, gender, coverPhoto, interests, isPrivate } = req.body; // Destructure interests and isPrivate
+    const {
+      username,
+      fullname,
+      email,
+      bio,
+      gender,
+      location,
+      website,
+      interests,
+      isPrivate,
+    } = req.body; 
 
     const profilePic = req.files?.profilePic ? req.files.profilePic[0] : null; // Check if profilePic exists
+    const coverPhoto = req.files?.coverPhoto ? req.files.coverPhoto[0] : null;
     let cloudResponse;
+    let coverCloudResponse;
 
     const user = await User.findById(userId).select("-password");
     if (!user) {
@@ -189,15 +223,40 @@ export const editProfile = async (req, res) => {
       }
     }
 
+    // Upload coverPhoto if provided
+    if (coverPhoto) {
+      try {
+        const coverFileUri = getDataUri(coverPhoto);
+        coverCloudResponse = await cloudinary.uploader.upload(
+          coverFileUri.content
+        );
+      } catch (err) {
+        return res.status(500).json({
+          message: "Failed to upload cover photo",
+          success: false,
+          error: err.message,
+        });
+      }
+    }
+
     const updatedFields = {};
-    if (username && username !== user.username) updatedFields.username = username;
-    if (fullname && fullname !== user.fullname) updatedFields.fullname = fullname;
+    if (username && username !== user.username)
+      updatedFields.username = username;
+    if (fullname && fullname !== user.fullname)
+      updatedFields.fullname = fullname;
     if (email && email !== user.email) updatedFields.email = email;
     if (bio && bio !== user.bio) updatedFields.bio = bio;
     if (gender && gender !== user.gender) updatedFields.gender = gender;
-    if (profilePic && cloudResponse) updatedFields.profilePic = cloudResponse.secure_url;
-    if (coverPhoto) updatedFields.coverPhoto = coverPhoto; // Handle the coverPhoto update if necessary
-    if (interests) updatedFields.interests = interests.split(",").map((interest) => interest.trim()); // Handle interests as an array
+    if (location && location !== user.location)
+      updatedFields.location = location;
+    if (website && website !== user.website) updatedFields.website = website;
+    if (profilePic && cloudResponse)
+      updatedFields.profilePic = cloudResponse.secure_url;
+    if (coverCloudResponse) updatedFields.coverPhoto = coverCloudResponse.secure_url;  // Handle the coverPhoto update if necessary
+    if (interests)
+      updatedFields.interests = interests
+        .split(",")
+        .map((interest) => interest.trim()); // Handle interests as an array
     if (isPrivate !== undefined) updatedFields.isPrivate = isPrivate; // Ensure privacy is handled
 
     if (Object.keys(updatedFields).length === 0) {
@@ -226,53 +285,62 @@ export const editProfile = async (req, res) => {
   }
 };
 
-
 export const searchUsers = async (req, res) => {
   try {
     const { query } = req.query;
 
     if (!query) {
-      return res.status(400).json({ success: false, message: "Query is required." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Query is required." });
     }
 
     // Search for users whose username or fullname starts with the query (case-insensitive)
     const users = await User.find({
       $or: [
         { username: { $regex: `^${query}`, $options: "i" } },
-        { fullname: { $regex: `^${query}`, $options: "i" } }
-      ]
+        { fullname: { $regex: `^${query}`, $options: "i" } },
+      ],
     }).select("username fullname profilePic _id");
 
     if (users.length === 0) {
-      return res.status(404).json({ success: false, message: "No users found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "No users found." });
     }
 
     return res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("Error searching users:", error);
-    return res.status(500).json({ success: false, message: "Something went wrong.", error: error.message });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Something went wrong.",
+        error: error.message,
+      });
   }
 };
 
-
-
-export const suggestedUsers = async (req, res) =>{
+export const suggestedUsers = async (req, res) => {
   try {
-    const suggestedUsers = await User.find({_id:{$ne:req.id}}).select("-password");
-    if(!suggestedUsers){
+    const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
+      "-password"
+    );
+    if (!suggestedUsers) {
       return res.status(400).json({
         message: "Currently do not have any users",
-        success: false
-      })
+        success: false,
+      });
     }
     return res.status(200).json({
       users: suggestedUsers,
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
 export const followOrUnfollow = async (req, res) => {
   try {
@@ -282,7 +350,7 @@ export const followOrUnfollow = async (req, res) => {
     if (userId === followingUserId) {
       return res.status(400).json({
         message: "You can't follow and unfollow yourself",
-        success: false
+        success: false,
       });
     }
 
@@ -292,7 +360,7 @@ export const followOrUnfollow = async (req, res) => {
     if (!user || !followingUser) {
       return res.status(404).json({
         message: "User not found",
-        success: false
+        success: false,
       });
     }
 
@@ -301,8 +369,16 @@ export const followOrUnfollow = async (req, res) => {
     if (isFollowing) {
       // Unfollow logic
       await Promise.all([
-        User.findByIdAndUpdate(userId, { $pull: { followings: followingUserId } }, { new: true }),
-        User.findByIdAndUpdate(followingUserId, { $pull: { followers: userId } }, { new: true })
+        User.findByIdAndUpdate(
+          userId,
+          { $pull: { followings: followingUserId } },
+          { new: true }
+        ),
+        User.findByIdAndUpdate(
+          followingUserId,
+          { $pull: { followers: userId } },
+          { new: true }
+        ),
       ]);
 
       const newUserData = await User.findById(userId);
@@ -311,25 +387,33 @@ export const followOrUnfollow = async (req, res) => {
         message: "Unfollowing",
         user: newUserData,
         followingUser: newFollowingUser,
-        success: true
+        success: true,
       });
     } else {
       // Follow logic
       await Promise.all([
-        User.findByIdAndUpdate(userId, { $push: { followings: followingUserId } }, { new: true }),
-        User.findByIdAndUpdate(followingUserId, { $push: { followers: userId } }, { new: true })
+        User.findByIdAndUpdate(
+          userId,
+          { $push: { followings: followingUserId } },
+          { new: true }
+        ),
+        User.findByIdAndUpdate(
+          followingUserId,
+          { $push: { followers: userId } },
+          { new: true }
+        ),
       ]);
 
       const newUserData = await User.findById(userId);
       const newFollowingUser = await User.findById(followingUserId);
 
-       // ✅ Send real-time notification to followed user
-       //const notification = {
-        //type: "follow",
-        //message: `${user.username} started following you.`,
-        //senderId: userId,
-        //receiverId: followingUserId,
-        //timestamp: new Date(),
+      // ✅ Send real-time notification to followed user
+      //const notification = {
+      //type: "follow",
+      //message: `${user.username} started following you.`,
+      //senderId: userId,
+      //receiverId: followingUserId,
+      //timestamp: new Date(),
       //};
 
       const notification = {
@@ -349,7 +433,7 @@ export const followOrUnfollow = async (req, res) => {
         message: "Following",
         user: newUserData,
         followingUser: newFollowingUser,
-        success: true
+        success: true,
       });
     }
   } catch (error) {
@@ -357,27 +441,38 @@ export const followOrUnfollow = async (req, res) => {
     return res.status(500).json({
       message: "An error occurred while processing your request",
       error: error.message,
-      success: false
+      success: false,
     });
   }
 };
-
 
 export const submitContactForm = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
     if (!name || !email || !message) {
-      return res.status(400).json({ success: false, message: "All required fields must be filled." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "All required fields must be filled.",
+        });
     }
 
     const newContact = new Contact({ name, email, subject, message });
     await newContact.save();
 
-    res.status(201).json({ success: true, message: "Message sent successfully!" });
+    res
+      .status(201)
+      .json({ success: true, message: "Message sent successfully!" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again later." });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Something went wrong. Please try again later.",
+      });
   }
 };
 
@@ -388,7 +483,9 @@ export const submitReport = async (req, res) => {
     const userId = req.id;
 
     if (!reportType || !description) {
-      return res.status(400).json({ message: "Report must contain a type and description" });
+      return res
+        .status(400)
+        .json({ message: "Report must contain a type and description" });
     }
 
     let imageUrl = "";
@@ -417,5 +514,199 @@ export const submitReport = async (req, res) => {
       error: error.message,
       success: false,
     });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select("-password");
+    return res.status(200).json({
+      users,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const editUser = async (req, res) => {
+  try {
+    const userId = req.id;
+    const {
+      username,
+      fullname,
+      email,
+      bio,
+      gender,
+      location,
+      website,
+      interests,
+      isPrivate,
+    } = req.body; 
+
+    const profilePic = req.files?.profilePic ? req.files.profilePic[0] : null; // Check if profilePic exists
+    const coverPhoto = req.files?.coverPhoto ? req.files.coverPhoto[0] : null;
+    let cloudResponse;
+    let coverCloudResponse;
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    // If profilePic exists, upload to Cloudinary
+    if (profilePic) {
+      try {
+        const fileUri = getDataUri(profilePic);
+        cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      } catch (err) {
+        return res.status(500).json({
+          message: "Failed to upload profile picture",
+          success: false,
+          error: err.message,
+        });
+      }
+    }
+
+    // Upload coverPhoto if provided
+    if (coverPhoto) {
+      try {
+        const coverFileUri = getDataUri(coverPhoto);
+        coverCloudResponse = await cloudinary.uploader.upload(
+          coverFileUri.content
+        );
+      } catch (err) {
+        return res.status(500).json({
+          message: "Failed to upload cover photo",
+          success: false,
+          error: err.message,
+        });
+      }
+    }
+
+    const updatedFields = {};
+    if (username && username !== user.username)
+      updatedFields.username = username;
+    if (fullname && fullname !== user.fullname)
+      updatedFields.fullname = fullname;
+    if (email && email !== user.email) updatedFields.email = email;
+    if (bio && bio !== user.bio) updatedFields.bio = bio;
+    if (gender && gender !== user.gender) updatedFields.gender = gender;
+    if (location && location !== user.location)
+      updatedFields.location = location;
+    if (website && website !== user.website) updatedFields.website = website;
+    if (profilePic && cloudResponse)
+      updatedFields.profilePic = cloudResponse.secure_url;
+    if (coverCloudResponse) updatedFields.coverPhoto = coverCloudResponse.secure_url;  // Handle the coverPhoto update if necessary
+    if (interests)
+      updatedFields.interests = interests
+        .split(",")
+        .map((interest) => interest.trim()); // Handle interests as an array
+    if (isPrivate !== undefined) updatedFields.isPrivate = isPrivate; // Ensure privacy is handled
+
+    if (Object.keys(updatedFields).length === 0) {
+      return res.status(200).json({
+        message: "No changes detected in profile.",
+        success: true,
+        user,
+      });
+    }
+
+    Object.assign(user, updatedFields);
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Error in editProfile:", error);
+    return res.status(500).json({
+      message: "Something went wrong while updating the profile",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await User.findByIdAndDelete(userId);
+    return res.status(200).json({
+      message: "User deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getUserStats = async (req, res) => {
+  try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of today
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1); // Start of tomorrow
+
+      // **1. Total Users**
+      const totalUsers = await User.countDocuments();
+
+      // **2. New Users (registered in the last 24 hours)**
+      const newUsers = await User.countDocuments({
+          createdAt: { $gte: today } // Users created today
+      });
+
+      // **3. Today's Active Users (users who logged in today)**
+      const activeUsers = await User.countDocuments({
+          lastLogin: { $gte: today, $lt: tomorrow } // Users who logged in today
+      });
+
+      const stats = {
+        totalUsers,
+        newUsers,
+        activeUsers
+      };
+      res.status(200).json({
+          success: true,
+          data: stats
+      });
+  } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.status(500).json({
+          success: false,
+          message: "Failed to fetch user stats",
+          error: error.message
+      });
+  }
+};
+
+export const getReportStats = async (req, res) => {
+  try {
+    const totalReports = await Report.countDocuments();
+
+    const today = moment().startOf("day").toDate();
+
+    const newReportsToday = await Report.countDocuments({ createdAt: { $gte: today } });
+    const pendingReports = await Report.countDocuments({ status: "pending" });
+    const resolvedReports = await Report.countDocuments({ status: "resolved" });
+    const canceledReports = await Report.countDocuments({ status: "canceled" });
+
+    return res.json({
+      success: true,
+      totalReports,
+      newReportsToday,
+      pendingReports,
+      resolvedReports,
+      canceledReports,
+    });
+
+  } catch (error) {
+    console.error("Error fetching report stats:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
