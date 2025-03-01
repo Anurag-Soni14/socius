@@ -6,6 +6,7 @@ import connectDB from "./utils/db.js";
 import userRoute from "./routers/user.route.js";
 import postRoute from "./routers/post.route.js";
 import messageRoute from "./routers/message.route.js";
+import reportRoute from "./routers/report.route.js";
 import { app, server, io } from "./socket/socket.js";  // Make sure `io` is imported
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(cors(corsOption));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
+app.use("/api/v1/report", reportRoute);
 
 app.get("/", (req, res) => {
     return res.status(200).json({ message: "Hello, server is running", success: true });

@@ -31,6 +31,8 @@ import AdminProtectedRoutes from "./components/AdminProtectedRoutes";
 import AdminDashboard from "./Pages/AdminDashboard";
 import UserManagement from "./Pages/UserManagement";
 import PostManagement from "./Pages/PostManagement";
+import ReportManagement from "./Pages/ReportManagement";
+import AdminEditUser from "./Pages/AdminEditUser";
 
 const browserRouter = createBrowserRouter([
   {
@@ -74,8 +76,9 @@ const browserRouter = createBrowserRouter([
       { path: "/admin", element: <AdminDashboard /> },
       { path: "/admin/users", element: <UserManagement /> },
       { path: "/admin/posts", element: <PostManagement /> },
-      // { path: "/admin/reports", element: <ReportManagement /> },
+      { path: "/admin/reports", element: <ReportManagement /> },
       // { path: "/admin/contact-us", element: <ContactUsManagement /> },
+      {path: "/admin/user/:id/edit", element: <AdminEditUser/>}
     ],
   },
 ]);

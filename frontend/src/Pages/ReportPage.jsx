@@ -37,7 +37,7 @@ const ReportPage = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/api/v1/user/report", 
+        "http://localhost:5000/api/v1/report/submit", 
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

@@ -18,7 +18,7 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Badge } from "./ui/badge";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
-import { setUserProfile } from "@/redux/authSlice";
+import { setAuthUser, setUserProfile } from "@/redux/authSlice";
 
 function Postframe({ post }) {
   const captionRef = useRef(null);
@@ -79,6 +79,69 @@ function Postframe({ post }) {
     }
   };
 
+  const handleDeletePost = async (postId) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/v1/post/delete/${postId}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        dispatch(setPosts(posts.filter((post) => post._id !== postId)));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const saveHander = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/v1/post/${post?._id}/save`,
+        { withCredentials: true }
+      );
+  
+      if (res.data.success) {
+        toast.success(res.data.message);
+  
+        // Update the user profile state after saving/unsaving
+        dispatch(
+          setUserProfile({
+            ...userProfile,
+            saved: isSaved
+              ? userProfile.saved.filter((p) => p._id !== post._id) // Remove from saved
+              : [...userProfile.saved, post], // Add to saved
+          })
+        );
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const handleFollowAndUnfollow = async (userId) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/v1/user/followorunfollow/${userId}`,
+        {},
+        { withCredentials: true } // Ensuring cookies are sent
+      );
+
+      // Ensure res.data exists before accessing it
+      if (res.data.success) {
+        
+        toast.success(res.data.message);
+      } else {
+        toast.info(res.data.message);
+      }
+    } catch (error) {
+      // Handle error gracefully
+      toast.error(error?.response?.data?.message || "An error occurred.");
+      console.log(error);
+    }
+  };
+
+
   const formatPostAge = (createdAt) => {
     const postDate = new Date(createdAt);
     const now = new Date();
@@ -133,17 +196,17 @@ function Postframe({ post }) {
                 <DialogDescription>Post related buttons</DialogDescription>
               </VisuallyHidden>
               {user && post?.author?._id !== user._id && (
-                <Button variant="ghost" className="text-error font-bold">
+                <Button variant="ghost" className="text-error font-bold" onClick={() => handleFollowAndUnfollow(post?.author?._id)}>
                   {user?.followings?.includes(post?.author?._id)
                     ? "Unfollow"
                     : "Follow"}
                 </Button>
               )}
-              <Button variant="ghost" onClick={() => console.log("Saved")}>
+              <Button variant="ghost" onClick={saveHander}>
                 {isSaved ? "Unsave" : "Save"}
               </Button>
               {user && post?.author?._id === user._id && (
-                <Button variant="ghost" className="text-error">
+                <Button variant="ghost" className="text-error" onClick={() => handleDeletePost(post._id)}>
                   Delete
                 </Button>
               )}
@@ -206,7 +269,7 @@ function Postframe({ post }) {
         </button>
         <button
           className="flex items-center gap-2 hover:text-primary"
-          onClick={() => console.log("Saved")}
+          onClick={saveHander}
         >
           {isSaved ? <FaBookmark /> : <FaRegBookmark />}
         </button>

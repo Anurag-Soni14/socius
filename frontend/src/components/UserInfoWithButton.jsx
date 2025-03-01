@@ -29,7 +29,6 @@ const UserInfoWithButton = ({ user }) => {
 
     try {
       setIsLoading(true);
-      console.log("Sending follow/unfollow request for userId:", userId);
 
       const res = await axios.post(
         `http://localhost:5000/api/v1/user/followorunfollow/${userId}`,
@@ -37,7 +36,6 @@ const UserInfoWithButton = ({ user }) => {
         { withCredentials: true }
       );
 
-      console.log("API Response:", res.data);
 
       if (res.data?.success) {
         setIsFollowing((prevState) => !prevState);

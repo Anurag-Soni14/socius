@@ -5,7 +5,6 @@ import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
 import { Contact } from "../models/contact-model.js";
-import { Report } from "../models/report.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const register = async (req, res) => {
@@ -476,46 +475,7 @@ export const submitContactForm = async (req, res) => {
   }
 };
 
-export const submitReport = async (req, res) => {
-  try {
-    const { reportType, description } = req.body;
-    const image = req.file;
-    const userId = req.id;
 
-    if (!reportType || !description) {
-      return res
-        .status(400)
-        .json({ message: "Report must contain a type and description" });
-    }
-
-    let imageUrl = "";
-    if (image) {
-      const fileUri = getDataUri(image);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-      imageUrl = cloudResponse.secure_url;
-    }
-
-    const report = await Report.create({
-      reportType,
-      description,
-      image: imageUrl,
-      user: userId,
-    });
-
-    return res.status(201).json({
-      message: "Report submitted successfully",
-      report,
-      success: true,
-    });
-  } catch (error) {
-    console.error("Error in addNewReport:", error);
-    return res.status(500).json({
-      message: "Something went wrong while submitting the report.",
-      error: error.message,
-      success: false,
-    });
-  }
-};
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -526,6 +486,20 @@ export const getAllUsers = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const getSingleUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {  // Check if user exists
+      return res.status(404).json({message: "User not found", success: false});
+    }
+    return res.status(200).json({user, success: true});
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return res.status(500).json({message: "Failed to fetch user", success: false, error: error.message});
   }
 };
 
@@ -636,6 +610,21 @@ export const editUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+        success: false,
+      });
+    }
+    const user = await User
+      .findById(userId)
+      .select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
     await User.findByIdAndDelete(userId);
     return res.status(200).json({
       message: "User deleted successfully",
@@ -666,14 +655,14 @@ export const getUserStats = async (req, res) => {
           lastLogin: { $gte: today, $lt: tomorrow } // Users who logged in today
       });
 
-      const stats = {
+      const userStats = {
         totalUsers,
         newUsers,
         activeUsers
       };
       res.status(200).json({
           success: true,
-          data: stats
+          userStats,
       });
   } catch (error) {
       console.error("Error fetching user stats:", error);
@@ -685,28 +674,3 @@ export const getUserStats = async (req, res) => {
   }
 };
 
-export const getReportStats = async (req, res) => {
-  try {
-    const totalReports = await Report.countDocuments();
-
-    const today = moment().startOf("day").toDate();
-
-    const newReportsToday = await Report.countDocuments({ createdAt: { $gte: today } });
-    const pendingReports = await Report.countDocuments({ status: "pending" });
-    const resolvedReports = await Report.countDocuments({ status: "resolved" });
-    const canceledReports = await Report.countDocuments({ status: "canceled" });
-
-    return res.json({
-      success: true,
-      totalReports,
-      newReportsToday,
-      pendingReports,
-      resolvedReports,
-      canceledReports,
-    });
-
-  } catch (error) {
-    console.error("Error fetching report stats:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
