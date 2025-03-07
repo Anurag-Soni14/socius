@@ -8,7 +8,7 @@ const AdminSidebar = () => {
     { name: "Users", icon: <Users size={20} />, path: "/admin/users" },
     { name: "Posts", icon: <FileText size={20} />, path: "/admin/posts" },
     { name: "Reports", icon: <Flag size={20} />, path: "/admin/reports" },
-    { name: "Messages", icon: <Mail size={20} />, path: "/admin/contact" },
+    { name: "Messages", icon: <Mail size={20} />, path: "/admin/contact-us" },
   ];
   
 

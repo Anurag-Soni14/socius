@@ -14,9 +14,11 @@ import { formatMessageTime, readFileAsDataURL } from "@/lib/utils";
 import useGetAllMessages from "@/hooks/useGetAllMessages";
 import useGetRTM from "@/hooks/useGetRTM";
 import { useNavigate } from "react-router-dom";
+import SidebarSkeleton from "@/skeletons/SidebarSkeleton";
+import MessageSkeleton from "@/skeletons/MessageSkeleton";
 
 const MessagePage = () => {
-  useGetAllMessages();
+  const {loading} = useGetAllMessages();
   useGetRTM();
   const navigate = useNavigate();
   const [textMessage, setTextMessage] = useState("");
@@ -118,6 +120,7 @@ const MessagePage = () => {
         <div className="flex items-center justify-center w-full h-full">
           <div className="bg-base-100 rounded-lg shadow-cl w-full h-full flex">
             <div className="flex h-full w-full rounded-lg overflow-hidden">
+            {!suggestedUsers ? <SidebarSkeleton /> :
               <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
                 <div className="border-b border-base-300 w-full p-5">
                   <div className="flex items-center gap-2">
@@ -192,6 +195,7 @@ const MessagePage = () => {
                   )}
                 </div>
               </aside>
+              }
 
               {!selectedUser ? (
                 <div className="w-full flex flex-1 flex-col items-center justify-center p-16 bg-base-100/50">
@@ -248,6 +252,7 @@ const MessagePage = () => {
                     </div>
                   </div>
 
+                  { loading ? <MessageSkeleton /> :
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                       <div
@@ -283,6 +288,7 @@ const MessagePage = () => {
                       </div>
                     ))}
                   </div>
+                  }
 
                   <div className="p-4 w-full">
                     {imagePreview && (

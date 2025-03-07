@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const ReportManagement = () => {
+  const navigate = useNavigate();
   const [reportStats, setReportStats] = useState({
     totalReports: 0,
     newReportsToday: 0,
@@ -178,7 +180,7 @@ const ReportManagement = () => {
                   {new Date(report.createdAt).toLocaleDateString()}
                 </td>
                 <td className="border p-2 justify-center flex gap-2">
-                  <button className="bg-green-500 text-white px-3 py-1 rounded">
+                  <button className="bg-green-500 text-white px-3 py-1 rounded" onClick={() => navigate(`/admin/report/${report._id}/edit`)}>
                     <FaEdit />
                   </button>
                   <button

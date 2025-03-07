@@ -21,17 +21,17 @@ const AdminEditUser = () => {
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState({
-    profilePic: user?.profilePic,
-    coverPhoto: user?.coverPhoto,
-    username: user?.username,
-    fullname: user?.fullname,
-    email: user?.email,
-    bio: user?.bio,
-    gender: user?.gender,
-    location: user?.location || "",
-    website: user?.website || "",
-    interests: user?.interests?.join(", ") || "",
-    isPrivate: user?.isPrivate || false, // Ensure it's controlled
+    profilePic: user?.profilePic || "",  // Ensure it's a string
+  coverPhoto: user?.coverPhoto || "",
+  username: user?.username || "",
+  fullname: user?.fullname || "",
+  email: user?.email || "",
+  bio: user?.bio || "",
+  gender: user?.gender || "male",  // Default to 'male' or 'female'
+  location: user?.location || "",
+  website: user?.website || "",
+  interests: user?.interests?.join(", ") || "",
+  isPrivate: user?.isPrivate || false, // Ensure it's boolean
   });
 
 
@@ -46,8 +46,17 @@ const AdminEditUser = () => {
         );
         setUser(data.user);
         setInput({
-          ...data.user,
-          interests: data.user.interests.join(", "),
+          profilePic: data.user.profilePic || "",
+        coverPhoto: data.user.coverPhoto || "",
+        username: data.user.username || "",
+        fullname: data.user.fullname || "",
+        email: data.user.email || "",
+        bio: data.user.bio || "",
+        gender: data.user.gender || "male",
+        location: data.user.location || "",
+        website: data.user.website || "",
+        interests: data.user.interests?.join(", ") || "",
+        isPrivate: data.user.isPrivate || false,
         });
       } catch (error) {
         toast.error("Failed to fetch user data");

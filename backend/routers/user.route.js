@@ -1,5 +1,5 @@
 import express from 'express';
-import {deleteUser, editProfile, editUser, followOrUnfollow, getAllUsers, getProfile, getSingleUser, getUser, getUserStats, login, logout, register, searchUsers, submitContactForm, suggestedUsers} from '../controllers/user.controller.js'
+import {deleteContact, deleteUser, editProfile, editUser, followOrUnfollow, getAllUsers, getContacts, getContactStats, getProfile, getSingleContacts, getSingleUser, getUser, getUserStats, login, logout, register, searchUsers, submitContactForm, suggestedUsers} from '../controllers/user.controller.js'
 import isAuthenticated from '../middlewares/isAuthenticated.js';
 import isAdmin from '../middlewares/isAdmin.js';
 import upload from '../middlewares/multer.js';
@@ -26,5 +26,9 @@ router.route('/admin/get-user/:id').get(isAuthenticated, isAdmin, getSingleUser)
 router.route('/admin/edit/:id').post(isAuthenticated, isAdmin, editUser);
 router.route('/admin/delete/:id').delete(isAuthenticated, isAdmin, deleteUser);
 router.route('/admin/user-stats').get(isAuthenticated, isAdmin, getUserStats);
+router.route('/admin/contact-stats').get(isAuthenticated, isAdmin, getContactStats);
+router.route('/admin/get-contacts').get(isAuthenticated, isAdmin, getContacts);
+router.route('/admin/get-contact/:id').get(isAuthenticated, isAdmin, getSingleContacts);
+router.route('/admin/delete-contact/:id').delete(isAuthenticated, isAdmin, deleteContact);
 
 export default router;

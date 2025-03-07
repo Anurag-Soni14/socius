@@ -97,3 +97,40 @@ export const deleteReport = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+export const editReport = async (req, res) => {
+  try {
+      const reportId = req.params.id;
+      const { status } = req.body;
+
+      if (!["pending", "resolved", "canceled"].includes(status)) {
+          return res.status(400).json({ message: "Invalid status value" });
+      }
+
+      const report = await Report.findById(reportId);
+      if (!report) {
+          return res.status(404).json({ message: "Report not found" });
+      }
+
+      report.status = status;
+      await report.save();
+
+      res.json({ message: "Report status updated successfully", success:true, report });
+  } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getSingleReport = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const report = await Report.findById(id);
+    if (!report) {
+      return res.status(404).json({ success: false, message: "Report not found" });
+    }
+    return res.json({ success: true, report });
+  } catch (error) {
+    console.error("Error fetching report:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}

@@ -442,26 +442,23 @@ export const postDelete = async (req, res) => {
   }
 }
 
-export const editPost = async (req, res) => {
+export const getSinglePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const { caption } = req.body;
     const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({
         message: "Post not found",
         success: false,
       });
-    } 
-    post.caption = caption;
-    await post.save();  
+    }
     return res.status(200).json({
-      message: "Post updated successfully",
+      post,
       success: true,
     });
   }
   catch (error) {
-    console.error("Error updating post:", error);
+    console.error("Error fetching post:", error);
     return res.status(500).json({
       message: "Something went wrong",
       success: false,
@@ -469,3 +466,48 @@ export const editPost = async (req, res) => {
     });
   }
 }
+
+
+export const editPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const { caption } = req.body;
+    const image = req.file;
+    // Find the post
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found", success: false });
+    }
+
+    let imageUrl = post.image; // Keep existing image by default
+
+    if (image) {
+      // Convert image buffer to Data URI
+      const fileUri = getDataUri(image);
+
+      // Upload new image to Cloudinary
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      imageUrl = cloudResponse.secure_url;
+    }
+
+    // Update the post
+    post.caption = caption || post.caption;
+    post.image = imageUrl;
+
+    await post.save();
+    await post.populate({ path: "author", select: "-password" });
+
+    return res.status(200).json({
+      message: "Post updated successfully",
+      post,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in editPost:", error);
+    return res.status(500).json({
+      message: "Something went wrong while updating the post.",
+      error: error.message,
+      success: false,
+    });
+  }
+};

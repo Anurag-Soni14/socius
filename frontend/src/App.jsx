@@ -33,6 +33,10 @@ import UserManagement from "./Pages/UserManagement";
 import PostManagement from "./Pages/PostManagement";
 import ReportManagement from "./Pages/ReportManagement";
 import AdminEditUser from "./Pages/AdminEditUser";
+import AdminEditPost from "./Pages/AdminEditPost";
+import AdminEditReport from "./Pages/AdminEditReport";
+import ContactManagement from "./Pages/ContactManagement";
+import AdminContactMessage from "./Pages/AdminContactMessage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -77,8 +81,11 @@ const browserRouter = createBrowserRouter([
       { path: "/admin/users", element: <UserManagement /> },
       { path: "/admin/posts", element: <PostManagement /> },
       { path: "/admin/reports", element: <ReportManagement /> },
-      // { path: "/admin/contact-us", element: <ContactUsManagement /> },
-      {path: "/admin/user/:id/edit", element: <AdminEditUser/>}
+      { path: "/admin/contact-us", element: <ContactManagement /> },
+      { path: "/admin/contact/:id/view", element: <AdminContactMessage /> },
+      {path: "/admin/user/:id/edit", element: <AdminEditUser/>},
+      {path: "/admin/post/:id/edit", element: <AdminEditPost/>},
+      {path: "/admin/report/:id/edit", element: <AdminEditReport/>},
     ],
   },
 ]);

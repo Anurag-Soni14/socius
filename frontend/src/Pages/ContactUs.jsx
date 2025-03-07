@@ -25,7 +25,7 @@ const ContactUs = () => {
     try {
       const res = await axios.post("http://localhost:5000/api/v1/user/contact-us", formData, { withCredentials: true });
       if(res.data.success){
-        setFormData({ name: "", email: "", subject: "", message: "" }); // Clear form on success
+        setFormData({ subject: "", message: "" }); // Clear form on success
         toast.success("Message sent successfully!");
       }
     } catch (error) {

@@ -674,3 +674,81 @@ export const getUserStats = async (req, res) => {
   }
 };
 
+export const getContactStats = async (req, res) => {
+  try {
+    const totalMessages = await Contact.countDocuments();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    const newMessagesToday = await Contact.countDocuments({ createdAt: { $gte: today } });
+
+    // Get the latest message date (for insight purposes)
+    const latestMessage = await Contact.findOne().sort({ createdAt: -1 });
+
+    const contactStats = {
+      totalMessages,
+      newMessagesToday,
+      latestMessageDate: latestMessage ? latestMessage.createdAt : null,
+    };
+
+    return res.json({
+      success: true,
+      contactStats,
+    });
+
+  } catch (error) {
+    console.error("Error fetching contact stats:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const getContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    return res.json({ success: true, contacts });
+  } catch (error) { 
+    console.error("Error fetching contacts:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}
+  
+export const deleteContact = async (req, res) => {
+  try {
+    const contactId = req.params.id;
+    if (!contactId) {
+      return res.status(400).json({
+        message: "Contact ID is required",
+        success: false,
+      });
+    }
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({
+        message: "Contact not found",
+        success: false,
+      });
+    }
+    await Contact.findByIdAndDelete(contactId);
+    return res.status(200).json({
+      message: "Contact deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSingleContacts = async (req, res) => {
+  try {
+    const contactId = req.params.id;
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({message: "Contact not found", success: false});
+    }
+    return res.status(200).json({contact, success: true});
+  } catch (error) {
+    console.error("Error fetching contact:", error);
+    return res.status(500).json({message: "Failed to fetch contact", success: false, error: error.message});
+  }
+}

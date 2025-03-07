@@ -5,8 +5,10 @@ import { FaEdit, FaTrash, FaSort } from "react-icons/fa";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const PostManagement = () => {
+  const navigate = useNavigate();
   const [postStats, setPostStats] = useState({
     newPosts: 0,
     newComments: 0,
@@ -158,7 +160,7 @@ const PostManagement = () => {
                   {new Date(post.createdAt).toLocaleDateString()}
                 </td>
                 <td className="border p-2 flex gap-2">
-                  <button className="bg-green-500 text-white px-3 py-1 rounded">
+                  <button className="bg-green-500 text-white px-3 py-1 rounded" onClick={() => {navigate(`/admin/post/${post._id}/edit`)}}>
                     <FaEdit />
                   </button>
                   <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => {

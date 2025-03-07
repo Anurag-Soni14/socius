@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import useGetUser from "@/hooks/useGetUser";
+import ProfileSkeleton from "@/skeletons/ProfileSkeleton";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -99,10 +100,10 @@ const Profile = () => {
     userProfile?.privacy === "public" || isFollowing || isLoggedInUserProfile;
   const canViewSaved =
     userProfile?.privacy === "public" || isFollowing || isLoggedInUserProfile;
-
+  
   return (
     <div className="max-w-5xl mx-auto bg-base-100 shadow-lg rounded-lg overflow-hidden h-full mt-1">
-      {loading && <p>Loading profile...</p>}
+      {loading && <ProfileSkeleton />}
       {error && <p className="text-red-500">{error}</p>}
       {/* Cover Photo */}
       <div className="relative h-52 bg-gray-200">
