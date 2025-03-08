@@ -128,9 +128,7 @@ const App = () => {
   }, [theme]);
 
   return (
-    <div className="h-full min-h-screen">
       <RouterProvider router={browserRouter} />
-    </div>
   );
 };
 

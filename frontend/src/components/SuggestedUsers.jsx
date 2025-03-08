@@ -6,7 +6,7 @@ function SuggestedUsers() {
   const { suggestedUsers } = useSelector(store => store.auth);
 
   return (
-    <div className="my-10">
+    <div className="my-10 w-full sm:w-60 lg:w-72">
       <div className="flex items-center justify-between text-sm">
         <h1 className="font-semibold text-base-content">Suggested for you</h1>
         <span className="text-primary hover:text-primary-focus cursor-pointer">See all</span>

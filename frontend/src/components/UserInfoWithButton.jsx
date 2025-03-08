@@ -54,9 +54,9 @@ const UserInfoWithButton = ({ user }) => {
   };
 
   return (
-    <div className="flex items-center justify-between my-2 p-2 rounded-md hover:bg-base-200">
+    <div className="flex sm:flex-col xl:flex-row  items-center justify-between my-2 p-2 rounded-md hover:bg-base-200 w-full">
       {/* User Info Section */}
-      <div className="flex items-center flex-1 min-w-0">
+      <div className="flex items-center sm:flex-col xl:flex-row xl:gap-2 sm:items-center flex-1 min-w-0">
         <Link to={`/profile/${user?._id}`}>
           <Avatar className="size-10 bg-secondary">
             <AvatarImage src={user?.profilePic} />
@@ -64,7 +64,7 @@ const UserInfoWithButton = ({ user }) => {
           </Avatar>
         </Link>
   
-        <div className="flex flex-col ml-3 min-w-0">
+        <div className="flex flex-col ml-3 min-w-0 sm:ml-0 sm:text-center xl:text-start w-full">
           <Link to={`/profile/${user?._id}`} className="font-bold text-sm md:text-base truncate">
             {user?.username}
           </Link>

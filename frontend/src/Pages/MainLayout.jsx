@@ -4,11 +4,11 @@ import { Outlet } from 'react-router-dom';
 
 function MainLayout() {
   return (
-    <div className="flex min-h-screen bg-base-100 text-base-content">
+    <div className="min-h-screen grid grid-rows-1 xl:grid-cols-[240px_1fr] sm:grid-cols-[64px_1fr]">
       <Sidebar />
-      <div className="flex-grow h-screen">
+      <div className="">
         <Outlet />
-      </div>
+      </div>  
     </div>
   );
 }

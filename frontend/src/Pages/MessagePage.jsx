@@ -115,7 +115,7 @@ const MessagePage = () => {
   },[messages]);
 
   return (
-    <div className="flex h-full ml-[16%]">
+    <div className="flex h-full">
       <div className="h-screen bg-base-200 flex-grow">
         <div className="flex items-center justify-center w-full h-full">
           <div className="bg-base-100 rounded-lg shadow-cl w-full h-full flex">

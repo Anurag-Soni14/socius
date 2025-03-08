@@ -17,12 +17,12 @@ import axios from "axios";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Badge } from "./ui/badge";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import useGetUserProfile from "@/hooks/useGetUserProfile";
-import { setAuthUser, setUserProfile } from "@/redux/authSlice";
+import { useNavigate } from "react-router-dom";
 
 function Postframe({ post }) {
   const captionRef = useRef(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.posts);
   // useGetUserProfile(user?._id);
@@ -166,7 +166,7 @@ function Postframe({ post }) {
       {/* Post Header */}
       {/* Post Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${post.author?._id}`)}>
           <Avatar className="size-12">
             <AvatarImage src={post.author?.profilePic} />
             <AvatarFallback className="bg-primary text-primary-content">
@@ -174,7 +174,7 @@ function Postframe({ post }) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-base-content">
+            <p className="font-semibold text-base-content cursor-pointer" onClick={() => navigate(`/profile/${post.author?._id}`)}>
               {post.author?.username}
             </p>
             <p className="text-sm text-base-content/70">

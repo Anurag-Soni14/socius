@@ -86,8 +86,8 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
             User comments will be shown here
           </DialogDescription>
         </VisuallyHidden>
-        <div className="flex flex-1">
-          <div className="w-1/2">
+        <div className="flex flex-1 flex-col md:flex-row">
+          <div className="w-full md:w-1/2">
             {selectedPost?.image ? (
               <img
                 src={selectedPost?.image}
@@ -107,7 +107,7 @@ function CommentDialog({ showCommentDialog, setShowCommentDialog }) {
               className="w-full h-full object-cover rounded-l-lg"
             />
           </div> */}
-          <div className="w-1/2 flex flex-col justify-between">
+          <div className="w-full md:w-1/2 flex flex-col justify-between">
             <div className="flex items-center justify-between p-4">
               <div className="flex gap-3 items-center">
                 <Link>

@@ -19,7 +19,6 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import {
-  clearLikeNotifications,
   clearMessageNotifications,
   markNotificationsAsSeen,
 } from "@/redux/rtnSlice";
@@ -32,7 +31,11 @@ function Sidebar() {
     (store) => store.realTimeNotification
   );
   const [openDialogForCreate, setOpenDialogForCreate] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
   const [isNotificationPopoverOpen, setIsNotificationPopoverOpen] = useState(false);
   const [isMessagePopoverOpen, setIsMessagePopoverOpen] = useState(false);
 
@@ -57,6 +60,7 @@ function Sidebar() {
   };
 
   const sidebarHandler = (menu) => {
+    setIsOpen(false);
     if (menu === "Logout") {
       logoutHandler();
     } else if (menu === "Create") {
@@ -96,9 +100,36 @@ function Sidebar() {
   ];
 
   return (
-    <div className="fixed top-0 left-0 z-10 w-[14%] h-screen border-r border-base-300 bg-base-100 text-base-content pl-4">
+    <aside
+      className={`bg-base-100 fixed top-0 left-0 z-20 h-screen w-60 transition-transform transform sm:sticky ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } sm:translate-x-0 sm:w-16 xl:w-60 p-4 sm:p-2 border-r border-base-300`}
+    >
+      {/* Button to toggle sidebar on small screens */}
+      {!isOpen && (
+        <button
+          className="sm:hidden absolute top-2 left-64 text-white text-3xl"
+          onClick={toggleSidebar}
+        >
+          ☰
+        </button>
+      )}
+
+      {/* Close button */}
+      <button
+        className="sm:hidden absolute top-4 right-4 text-white text-2xl"
+        onClick={toggleSidebar}
+      >
+        X
+      </button>
+
+      {/* Sidebar Content */}
+      <h1 className="text-white text-2xl font-bold mb-6 sm:text-sm xl:text-2xl">
+        Logo
+      </h1>
+
+      {/* Sidebar Items */}
       <div className="flex flex-col h-full">
-        <h1 className="my-8 pl-3 font-bold text-xl text-base-content">Logo</h1>
         <div className="flex-grow">
           {sidebarItems.map((ListItem, index) => (
             <Popover
@@ -120,21 +151,27 @@ function Sidebar() {
             >
               <PopoverTrigger asChild>
                 <div
-                  className="cursor-pointer flex items-center gap-3 relative hover:bg-base-200 rounded-lg p-3 my-3"
+                  className="w-full size-12 cursor-pointer flex items-center gap-3 px-3 relative hover:bg-base-200 rounded-lg xl:p-3 my-3 xl:mx-2 sm:mx-1 sm:p-2"
                   onClick={() => sidebarHandler(ListItem.text)}
                   onMouseEnter={() => {
-                    if (ListItem.text === "Notification") setIsNotificationPopoverOpen(true);
-                    if (ListItem.text === "Messages") setIsMessagePopoverOpen(true);
+                    if (ListItem.text === "Notification")
+                      setIsNotificationPopoverOpen(true);
+                    if (ListItem.text === "Messages")
+                      setIsMessagePopoverOpen(true);
                   }}
                   onMouseLeave={() => {
-                    if (ListItem.text === "Notification") setIsNotificationPopoverOpen(false);
-                    if (ListItem.text === "Messages") setIsMessagePopoverOpen(false);
+                    if (ListItem.text === "Notification")
+                      setIsNotificationPopoverOpen(false);
+                    if (ListItem.text === "Messages")
+                      setIsMessagePopoverOpen(false);
                   }}
                 >
-                  <span className="text-base-content hover:text-primary">
+                  <span className="text-white hover:text-primary">
                     {ListItem.icon}
                   </span>
-                  <span className="text-base-content">{ListItem.text}</span>
+                  <span className="text-white ml-4 sm:hidden xl:block">
+                    {ListItem.text}
+                  </span>
 
                   {/* Notification Badge */}
                   {(ListItem.text === "Notification" && newNotifications?.length > 0) ||
@@ -159,11 +196,16 @@ function Sidebar() {
                       newNotifications.map((notification, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <Avatar>
-                            <AvatarImage src={notification?.userDetails?.profilePic} />
+                            <AvatarImage
+                              src={notification?.userDetails?.profilePic}
+                            />
                             <AvatarFallback>CN</AvatarFallback>
                           </Avatar>
                           <p className="text-sm">
-                            <span className="font-bold">{notification?.userDetails?.username}</span> {notification?.message}
+                            <span className="font-bold">
+                              {notification?.userDetails?.username}
+                            </span>{" "}
+                            {notification?.message}
                           </p>
                         </div>
                       ))
@@ -186,7 +228,10 @@ function Sidebar() {
                             <AvatarFallback>CN</AvatarFallback>
                           </Avatar>
                           <p className="text-sm">
-                            <span className="font-bold">{msg?.userDetails?.username}</span> {msg?.message}
+                            <span className="font-bold">
+                              {msg?.userDetails?.username}
+                            </span>{" "}
+                            {msg?.message}
                           </p>
                         </div>
                       ))
@@ -200,8 +245,13 @@ function Sidebar() {
           ))}
         </div>
       </div>
-      <CreatePost openDialogForCreate={openDialogForCreate} setOpenDialogForCreate={setOpenDialogForCreate}/>
-    </div>
+
+      {/* Create Post Dialog */}
+      <CreatePost
+        openDialogForCreate={openDialogForCreate}
+        setOpenDialogForCreate={setOpenDialogForCreate}
+      />
+    </aside>
   );
 }
 
