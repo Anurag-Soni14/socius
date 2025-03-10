@@ -321,78 +321,78 @@ export const searchUsers = async (req, res) => {
   }
 };
 
-// export const suggestedUsers = async (req, res) => {
-//   try {
-//     const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
-//       "-password"
-//     );
-//     if (!suggestedUsers) {
-//       return res.status(400).json({
-//         message: "Currently do not have any users",
-//         success: false,
-//       });
-//     }
-//     return res.status(200).json({
-//       users: suggestedUsers,
-//       success: true,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
 export const suggestedUsers = async (req, res) => {
   try {
-    const loggedInUser = await User.findById(req.id).select("interests location followings");
-
-    if (!loggedInUser) {
-      return res.status(404).json({ message: "User not found", success: false });
+    const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
+      "-password"
+    );
+    if (!suggestedUsers) {
+      return res.status(400).json({
+        message: "Currently do not have any users",
+        success: false,
+      });
     }
-
-    const { interests, location, followings } = loggedInUser;
-
-    // Base query: Exclude the logged-in user and already followed users
-    let query = { _id: { $ne: req.id, $nin: followings } };
-
-    // Filter by interests if the user has interests
-    if (interests.length > 0) {
-      query.interests = { $in: interests };
-    }
-
-    // Filter by location if available
-    if (location) {
-      query.location = location;
-    }
-
-    // Find suggested users
-    let suggestedUsers = await User.find(query)
-      .select("-password")
-      .limit(10) // Limit results for performance
-      .lean();
-
-    // Prioritize users with mutual followers
-    suggestedUsers = suggestedUsers.map((user) => {
-      const mutualFollowers = user.followers?.filter((follower) =>
-        followings.includes(follower.toString())
-      ).length;
-      return { ...user, mutualFollowers };
+    return res.status(200).json({
+      users: suggestedUsers,
+      success: true,
     });
-
-    // Sort by most mutual followers
-    suggestedUsers.sort((a, b) => b.mutualFollowers - a.mutualFollowers);
-
-    // If no users found, return message
-    if (suggestedUsers.length === 0) {
-      return res.status(200).json({ message: "No suggested users found", success: true, users: [] });
-    }
-
-    return res.status(200).json({ users: suggestedUsers, success: true });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error", success: false });
+    console.log(error);
   }
 };
+
+
+// export const suggestedUsers = async (req, res) => {
+//   try {
+//     const loggedInUser = await User.findById(req.id).select("interests location followings");
+
+//     if (!loggedInUser) {
+//       return res.status(404).json({ message: "User not found", success: false });
+//     }
+
+//     const { interests, location, followings } = loggedInUser;
+
+//     // Base query: Exclude the logged-in user and already followed users
+//     let query = { _id: { $ne: req.id, $nin: followings } };
+
+//     // Filter by interests if the user has interests
+//     if (interests.length > 0) {
+//       query.interests = { $in: interests };
+//     }
+
+//     // Filter by location if available
+//     if (location) {
+//       query.location = location;
+//     }
+
+//     // Find suggested users
+//     let suggestedUsers = await User.find(query)
+//       .select("-password")
+//       .limit(10) // Limit results for performance
+//       .lean();
+
+//     // Prioritize users with mutual followers
+//     suggestedUsers = suggestedUsers.map((user) => {
+//       const mutualFollowers = user.followers?.filter((follower) =>
+//         followings.includes(follower.toString())
+//       ).length;
+//       return { ...user, mutualFollowers };
+//     });
+
+//     // Sort by most mutual followers
+//     suggestedUsers.sort((a, b) => b.mutualFollowers - a.mutualFollowers);
+
+//     // If no users found, return message
+//     if (suggestedUsers.length === 0) {
+//       return res.status(200).json({ message: "No suggested users found", success: true, users: [] });
+//     }
+
+//     return res.status(200).json({ users: suggestedUsers, success: true });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: "Server error", success: false });
+//   }
+// };
 
 
 export const followOrUnfollow = async (req, res) => {

@@ -79,6 +79,35 @@ export const getAllPost = async (req, res) => {
   }
 };
 
+// export const getAllPost = async (req, res) => {
+//   try {
+//     const { page = 1, limit = 10 } = req.query; // Default values for pagination
+
+//     const posts = await Post.find()
+//       .sort({ createdAt: -1 })
+//       .skip((page - 1) * limit) // Skip previous pages
+//       .limit(parseInt(limit)) // Fetch limited posts
+//       .populate({ path: "author", select: "username profilePic" })
+//       .populate({
+//         path: "comments",
+//         sort: { createdAt: -1 },
+//         populate: { path: "author", select: "username profilePic" },
+//       });
+
+//     const totalPosts = await Post.countDocuments(); // Get total post count
+
+//     return res.status(200).json({
+//       posts,
+//       hasMore: page * limit < totalPosts, // True if there are more posts
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Server error", success: false });
+//   }
+// };
+
+
 export const getUserPost = async (req, res) => {
   try {
     const authorId = req.id;

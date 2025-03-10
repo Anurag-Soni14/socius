@@ -22,6 +22,8 @@ import {
   clearMessageNotifications,
   markNotificationsAsSeen,
 } from "@/redux/rtnSlice";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -36,8 +38,10 @@ function Sidebar() {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-  const [isNotificationPopoverOpen, setIsNotificationPopoverOpen] = useState(false);
+  const [isNotificationPopoverOpen, setIsNotificationPopoverOpen] =
+    useState(false);
   const [isMessagePopoverOpen, setIsMessagePopoverOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const logoutHandler = async () => {
     try {
@@ -62,7 +66,7 @@ function Sidebar() {
   const sidebarHandler = (menu) => {
     setIsOpen(false);
     if (menu === "Logout") {
-      logoutHandler();
+      setOpenDialog(true);
     } else if (menu === "Create") {
       setOpenDialogForCreate(true);
     } else if (menu === "Profile") {
@@ -174,8 +178,10 @@ function Sidebar() {
                   </span>
 
                   {/* Notification Badge */}
-                  {(ListItem.text === "Notification" && newNotifications?.length > 0) ||
-                  (ListItem.text === "Messages" && messageNotification?.length > 0) ? (
+                  {(ListItem.text === "Notification" &&
+                    newNotifications?.length > 0) ||
+                  (ListItem.text === "Messages" &&
+                    messageNotification?.length > 0) ? (
                     <Button
                       size="icon"
                       className="rounded-full size-5 absolute bottom-6 left-6 bg-red-600 hover:bg-red-600"
@@ -251,6 +257,43 @@ function Sidebar() {
         openDialogForCreate={openDialogForCreate}
         setOpenDialogForCreate={setOpenDialogForCreate}
       />
+
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent
+          onInteractOutside={() => setOpenDialog(false)}
+          className="max-w-xl p-0 flex flex-col bg-base-100 text-base-content"
+        >
+          <VisuallyHidden>
+            <DialogTitle>confirm delete</DialogTitle>
+            <DialogDescription>
+              admin confirmation for delete the user
+            </DialogDescription>
+          </VisuallyHidden>
+          <div className="flex flex-col justify-center items-center p-6 gap-4">
+            <div className="text-xl font-bold">
+              <p>Are you sure to logout ?</p>
+            </div>
+            <div className="flex gap-10 justify-center">
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded"
+                onClick={() => {
+                  setOpenDialog(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-500 text-white px-3 py-1 rounded"
+                onClick={() => {
+                  logoutHandler();
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }
