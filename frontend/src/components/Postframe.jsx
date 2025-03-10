@@ -18,6 +18,7 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import { Badge } from "./ui/badge";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useNavigate } from "react-router-dom";
+import { setUserProfile } from "@/redux/authSlice";
 
 function Postframe({ post }) {
   const captionRef = useRef(null);

@@ -37,6 +37,7 @@ import AdminEditPost from "./Pages/AdminEditPost";
 import AdminEditReport from "./Pages/AdminEditReport";
 import ContactManagement from "./Pages/ContactManagement";
 import AdminContactMessage from "./Pages/AdminContactMessage";
+import SavedPostsPage from "./Pages/SavedPostsPage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -63,6 +64,7 @@ const browserRouter = createBrowserRouter([
       { path: "/account/report", element: <ReportPage /> },
       { path: "/account/liked-post", element: <LikedPostsPage /> },
       { path: "/account/commented-post", element: <CommentedPostsPage /> },
+      { path: "/account/saved-post", element: <SavedPostsPage /> },
       { path: "/profile/:id/followers-following", element: <FollowersFollowingPage /> },
     ],
   },

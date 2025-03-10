@@ -101,14 +101,14 @@ function Sidebar() {
 
   return (
     <aside
-      className={`bg-base-100 fixed top-0 left-0 z-20 h-screen w-60 transition-transform transform sm:sticky ${
+      className={`bg-base-100 fixed top-0 left-0 z-20 h-screen w-60 transition-transform transform sm:sticky sm:top-0 sm:left-0 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } sm:translate-x-0 sm:w-16 xl:w-60 p-4 sm:p-2 border-r border-base-300`}
     >
       {/* Button to toggle sidebar on small screens */}
       {!isOpen && (
         <button
-          className="sm:hidden absolute top-2 left-64 text-white text-3xl"
+          className="sm:hidden absolute top-2 left-64 text-base-content text-3xl"
           onClick={toggleSidebar}
         >
           ☰
@@ -117,14 +117,14 @@ function Sidebar() {
 
       {/* Close button */}
       <button
-        className="sm:hidden absolute top-4 right-4 text-white text-2xl"
+        className="sm:hidden absolute top-4 right-4 text-base-content text-2xl"
         onClick={toggleSidebar}
       >
         X
       </button>
 
       {/* Sidebar Content */}
-      <h1 className="text-white text-2xl font-bold mb-6 sm:text-sm xl:text-2xl">
+      <h1 className="text-base-content text-2xl font-bold mb-6 sm:text-sm xl:text-2xl">
         Logo
       </h1>
 
@@ -166,10 +166,10 @@ function Sidebar() {
                       setIsMessagePopoverOpen(false);
                   }}
                 >
-                  <span className="text-white hover:text-primary">
+                  <span className="text-base-content hover:text-primary">
                     {ListItem.icon}
                   </span>
-                  <span className="text-white ml-4 sm:hidden xl:block">
+                  <span className="text-base-content ml-4 sm:hidden xl:block">
                     {ListItem.text}
                   </span>
 
