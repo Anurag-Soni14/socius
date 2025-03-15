@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import axios from "axios";
 import { FaEdit, FaTrash, FaSort } from "react-icons/fa";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -71,8 +76,10 @@ const PostManagement = () => {
       }
     } catch (error) {
       console.error("Error deleting post", error);
+    } finally {
+      setOpenDialog(false);
     }
-  }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -134,44 +141,56 @@ const PostManagement = () => {
             onChange={handleSearch}
           />
         </div>
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Sr. No.</th>
-              <th className="border p-2">Title</th>
-              <th className="border p-2">Likes</th>
-              <th className="border p-2">Comments</th>
-              <th className="border p-2">Author</th>
-              <th className="border p-2">Created At</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPosts.map((post, index) => (
-              <tr key={post._id} className="hover:bg-gray-50">
-                <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">
-                  {post.caption ? post.caption : "No caption..."}
-                </td>
-                <td className="border p-2">{post.likes.length}</td>
-                <td className="border p-2">{post.comments.length}</td>
-                <td className="border p-2">{post.author.username}</td>
-                <td className="border p-2">
-                  {new Date(post.createdAt).toLocaleDateString()}
-                </td>
-                <td className="border p-2 flex gap-2">
-                  <button className="bg-green-500 text-white px-3 py-1 rounded" onClick={() => {navigate(`/admin/post/${post._id}/edit`)}}>
-                    <FaEdit />
-                  </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => {
-                    setSelectedPost(post); setOpenDialog(true);}}>
-                    <FaTrash />
-                  </button>
-                </td>
+        <div className="overflow-auto max-h-96">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-base-300 shadow-md">
+              <tr>
+                <th className="p-4">Sr. No.</th>
+                <th className="p-4 text-start">Title</th>
+                <th className="p-4 text-start">Likes</th>
+                <th className="p-4 text-start">Comments</th>
+                <th className="p-4 text-start">Author</th>  
+                <th className="p-4 text-start">Created At</th>
+                <th className="p-4">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredPosts.map((post, index) => (
+                <tr key={post._id}  className="even:bg-base-200 odd:bg-base-100">
+                  <td className="p-4">{index + 1}</td>
+                  <td className="p-4">
+                    {post.caption ? post.caption : "No caption..."}
+                  </td>
+                  <td className="p-4">{post.likes.length}</td>
+                  <td className="p-4">{post.comments.length}</td>
+                  <td className="p-4">{post.author.username}</td>
+                  <td className="p-4">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 flex justify-center items-center gap-4">
+                    <button
+                      className="bg-green-500 text-white px-3 py-1 rounded"
+                      onClick={() => {
+                        navigate(`/admin/post/${post._id}/edit`);
+                      }}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                      onClick={() => {
+                        setSelectedPost(post);
+                        setOpenDialog(true);
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent

@@ -82,6 +82,8 @@ const ReportManagement = () => {
       }
     } catch (error) {
       console.error("Error deleting report", error);
+    } finally {
+      setOpenDialog(false);
     }
   };
 
@@ -158,45 +160,52 @@ const ReportManagement = () => {
             onChange={handleSearch}
           />
         </div>
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Sr. No.</th>
-              <th className="border p-2">Report Type</th>
-              <th className="border p-2">User</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Created At</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredReports?.map((report, index) => (
-              <tr key={report._id} className="hover:bg-gray-50">
-                <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">{report.reportType}</td>
-                <td className="border p-2">{report.user.username}</td>
-                <td className="border p-2">{report.status}</td>
-                <td className="border p-2">
-                  {new Date(report.createdAt).toLocaleDateString()}
-                </td>
-                <td className="border p-2 justify-center flex gap-2">
-                  <button className="bg-green-500 text-white px-3 py-1 rounded" onClick={() => navigate(`/admin/report/${report._id}/edit`)}>
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                    onClick={() => {
-                      setSelectedReport(report);
-                      setOpenDialog(true);
-                    }}
-                  >
-                    <FaTrash />
-                  </button>
-                </td>
+        <div className="overflow-auto max-h-96">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-base-300 shadow-md">
+              <tr>
+                <th className="p-4 text-start">Sr. No.</th>
+                <th className="p-4 text-start">Report Type</th>
+                <th className="p-4 text-start">User</th>
+                <th className="p-4 text-start">Status</th>
+                <th className="p-4 text-start">Created At</th>
+                <th className="p-4">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredReports?.map((report, index) => (
+                <tr key={report._id} className="even:bg-base-200 odd:bg-base-100">
+                  <td className="p-4">{index + 1}</td>
+                  <td className="p-4">{report.reportType}</td>
+                  <td className="p-4">{report.user.username}</td>
+                  <td className="p-4">{report.status}</td>
+                  <td className="p-4">
+                    {new Date(report.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 flex justify-center items-center gap-4">
+                    <button
+                      className="bg-green-500 text-white px-3 py-1 rounded"
+                      onClick={() =>
+                        navigate(`/admin/report/${report._id}/edit`)
+                      }
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                      onClick={() => {
+                        setSelectedReport(report);
+                        setOpenDialog(true);
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent

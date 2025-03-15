@@ -65,7 +65,7 @@ const AdminDashboard = () => {
         {['daily', 'weekly', 'monthly'].map((period) => (
           <button
             key={period}
-            className={`px-4 py-2 rounded-md font-bold ${timeframe === period ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+            className={`px-4 py-2 rounded-md font-bold ${timeframe === period ? 'bg-primary text-white' : 'bg-base-300 text-base-content'}`}
             onClick={() => setTimeframe(period)}
           >
             {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -74,25 +74,25 @@ const AdminDashboard = () => {
       </div>
 
       {/* User Statistics */}
-      <div className="col-span-2 p-6 bg-white shadow-md rounded-md">
+      <div className="col-span-2 p-6 bg-base-100 shadow-md rounded-lg">
         <h2 className="font-bold text-lg">User Growth</h2>
         <Line data={userGrowthChart} />
       </div>
       
       {/* Post Insights */}
-      <div className="p-6 bg-white shadow-md rounded-md">
+      <div className="p-6 bg-base-100 shadow-md rounded-lg">
         <h2 className="font-bold text-lg">Posts Per Day</h2>
         <Bar data={postChart} />
       </div>
 
       {/* Report Overview */}
-      <div className="p-6 bg-white shadow-md rounded-md">
+      <div className="p-6 bg-base-100 shadow-md rounded-lg">
         <h2 className="font-bold text-lg">Report Breakdown</h2>
         <Pie data={reportChart} />
       </div>
 
       {/* Survey Form */}
-      <div className="col-span-2 p-6 bg-white shadow-md rounded-md">
+      <div className="col-span-2 p-6 bg-base-100 shadow-md rounded-lg">
         <h2 className="font-bold text-lg">Create a Survey</h2>
         <input
           type="text"
@@ -105,7 +105,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Send Notification */}
-      <div className="p-6 bg-white shadow-md rounded-md">
+      <div className="bg-base-100 shadow-md p-6 rounded-lg">
         <h2 className="font-bold text-lg">Send Notification</h2>
         <textarea
           placeholder="Type your message..."

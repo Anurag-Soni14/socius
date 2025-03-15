@@ -64,12 +64,6 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (userId) => {
-    // axios.delete(`http://localhost:5000/api/v1/user/admin/user/${userId}`, { withCredentials: true })
-    //   .then(() => {
-    //     const updatedUsers = users.filter((user) => user._id !== userId);
-    //     setUsers(updatedUsers);
-    //     setFilteredUsers(updatedUsers);
-    //   });
     try {
       const res = await axios.delete(
         `http://localhost:5000/api/v1/user/admin/delete/${userId}`,
@@ -85,6 +79,8 @@ const UserManagement = () => {
     } catch (error) {
       toast.error("Failed to delete user");
       console.error(error);
+    }finally{
+      setOpenDialog(false);
     }
   };
 
@@ -141,37 +137,35 @@ const UserManagement = () => {
             onChange={handleSearch}
           />
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-neutral text-white">
-                <th className="border p-2">Sr. No.</th>
+        <div className="overflow-auto max-h-96">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-base-300 shadow-md">
+              <tr>
+                <th className="p-4 text-start">Sr. No.</th>
                 <th
-                  className="border p-2 cursor-pointer"
+                  className="p-4 text-start cursor-pointer"
                   onClick={() => handleSort("username")}
                 >
                   Username <FaSort className="inline ml-1" />
                 </th>
                 <th
-                  className="border p-2 cursor-pointer"
+                  className="p-4 text-start cursor-pointer"
                   onClick={() => handleSort("email")}
                 >
                   Email <FaSort className="inline ml-1" />
                 </th>
-                <th className="border p-2">Role</th>
-                <th className="border p-2">Actions</th>
+                <th className="p-4 text-start">Role</th>
+                <th className="p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((user, index) => (
-                <tr key={user._id} className="hover:bg-gray-100">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{user.username}</td>
-                  <td className="border p-2">{user.email}</td>
-                  <td className="border p-2">
-                    {user.isAdmin ? "Admin" : "User"}
-                  </td>
-                  <td className="border p-2 flex gap-4 justify-center">
+                <tr key={user._id} className="even:bg-base-200 odd:bg-base-100">
+                  <td className="p-4">{index + 1}</td>
+                  <td className="p-4">{user.username}</td>
+                  <td className="p-4">{user.email}</td>
+                  <td className="p-4">{user.isAdmin ? "Admin" : "User"}</td>
+                  <td className="p-4 flex justify-center items-center gap-4">
                     <button
                       className="bg-green-500 text-white px-3 py-1 rounded"
                       onClick={() => handleEditNavigation(user._id)}
