@@ -7,9 +7,10 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import Logo from "../assets/Logo.png";
 
 function Signup() {
-  const {user} = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setLoding] = useState(false);
   const navigate = useNavigate();
@@ -56,10 +57,10 @@ function Signup() {
   };
 
   useEffect(() => {
-      if (user) {
-        navigate("/");
-      }
-    }, []);
+    if (user) {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <div className="flex items-center w-screen h-screen justify-center bg-base-100">
@@ -68,7 +69,9 @@ function Signup() {
         onSubmit={handleSubmit}
       >
         <div className="my-4">
-          <h1 className="text-center font-bold text-xl text-primary">LOGO</h1>
+          <div className="w-full flex justify-center">
+            <img src={Logo} alt="Logo" className="w-40" />
+          </div>
           <p className="text-center text-sm text-base-content">
             Signup now to explore the world of socius
           </p>

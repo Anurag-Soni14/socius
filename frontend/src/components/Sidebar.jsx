@@ -24,6 +24,8 @@ import {
 } from "@/redux/rtnSlice";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import Logo from '../assets/Logo.png'
+import SmallLogo from '../assets/small-logo.png'
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -128,9 +130,12 @@ function Sidebar() {
       </button>
 
       {/* Sidebar Content */}
-      <h1 className="text-base-content text-2xl font-bold mb-6 sm:text-sm xl:text-2xl">
-        Logo
-      </h1>
+      <div className="w-full px-3 my-2 sm:hidden xl:block">
+        <img src={Logo} alt="Logo" className="w-40"/>
+      </div>
+      <div className="w-full px-3 my-2 hidden sm:block xl:hidden">
+        <img src={SmallLogo} alt="Logo" className="w-20"/>
+      </div>
 
       {/* Sidebar Items */}
       <div className="flex flex-col h-full">

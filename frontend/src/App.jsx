@@ -38,6 +38,7 @@ import AdminEditReport from "./Pages/AdminEditReport";
 import ContactManagement from "./Pages/ContactManagement";
 import AdminContactMessage from "./Pages/AdminContactMessage";
 import SavedPostsPage from "./Pages/SavedPostsPage";
+import { toast } from "sonner";
 
 const browserRouter = createBrowserRouter([
   {
@@ -108,8 +109,10 @@ const App = () => {
   
       socket.on("notification", (notification) => {
         if (notification.type === "like" || notification.type === "dislike" || notification.type === "follow" || notification.type === "comment") {
+          toast.info("You have a new notification");
           dispatch(addNotification(notification)); // Store in newNotifications
         } else if (notification.type === "message") {
+          toast.info("You have a new message");
           dispatch(setMessageNotification(notification)); // Store separately
         }
       });

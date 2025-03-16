@@ -8,9 +8,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import Logo from "../assets/Logo.png";
 
 function Login() {
-  const {user} = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setLoding] = useState(false);
   const [formData, setFormData] = useState({
@@ -70,7 +71,9 @@ function Login() {
         onSubmit={handleSubmit}
       >
         <div className="my-4">
-          <h1 className="text-center font-bold text-xl text-primary">LOGO</h1>
+          <div className="w-full flex justify-center">
+            <img src={Logo} alt="Logo" className="w-40" />
+          </div>
           <p className="text-center text-sm text-base-content">
             Login now to explore the world of socius
           </p>
