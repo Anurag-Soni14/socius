@@ -18,11 +18,20 @@ export const register = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    // Check if the email or username already exists
+    const userByEmail = await User.findOne({ email });
+    const userByUsername = await User.findOne({ username });
 
-    if (user) {
-      return res.status(401).json({
-        message: "User already exists",
+    if (userByEmail) {
+      return res.status(400).json({
+        message: "Email already in use",
+        success: false,
+      });
+    }
+
+    if (userByUsername) {
+      return res.status(400).json({
+        message: "Username already taken",
         success: false,
       });
     }
@@ -208,6 +217,28 @@ export const editProfile = async (req, res) => {
       });
     }
 
+
+    // Check if the new username or email already exists
+    if (username && username !== user.username) {
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        return res.status(400).json({
+          message: "Username already exists",
+          success: false,
+        });
+      }
+    }
+
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({
+          message: "Email already exists",
+          success: false,
+        });
+      }
+    }
+    
     // If profilePic exists, upload to Cloudinary
     if (profilePic) {
       try {
