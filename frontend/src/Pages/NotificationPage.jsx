@@ -36,7 +36,7 @@ function NotificationPage() {
       </div>
 
       {notificationHistory?.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-4 mx-2">
           {notificationHistory.map((notification, index) => (
             <div key={index} className="flex items-center gap-4 p-4 bg-base-200 rounded-lg shadow">
               {/* User Avatar */}
