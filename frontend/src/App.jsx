@@ -39,6 +39,7 @@ import ContactManagement from "./Pages/ContactManagement";
 import AdminContactMessage from "./Pages/AdminContactMessage";
 import SavedPostsPage from "./Pages/SavedPostsPage";
 import { toast } from "sonner";
+import ExplorePage from "./Pages/ExplorePage";
 
 const browserRouter = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ const browserRouter = createBrowserRouter([
     ),
     children: [
       { path: "/", element: <Home /> },
+      { path: "/explore", element: <ExplorePage /> },
       { path: "/profile/:id", element: <Profile /> },
       { path: "/account/settings", element: <Setting /> },
       { path: "/account/settings/edit-profile", element: <EditProfile /> },

@@ -28,11 +28,18 @@ const Profile = () => {
   const { userProfile, user } = useSelector((store) => store.auth);
   const [activeTab, setActiveTab] = useState("posts");
   const [isFollowing, setIsFollowing] = useState(false);
+  const [localPosts, setLocalPosts] = useState([]);
   useEffect(() => {
     if (user && userProfile) {
       setIsFollowing(user.followings.includes(userProfile._id));
     }
   }, [user, userProfile]);
+
+  useEffect(() => {
+    if (userProfile?.posts) {
+      setLocalPosts([...userProfile.posts]);
+    }
+  }, [userProfile?.posts]);
 
   const [userProfileFollowers, setUserProfileFollowers] = useState(
     userProfile?.followers?.length
@@ -49,34 +56,36 @@ const Profile = () => {
       const res = await axios.post(
         `http://localhost:5000/api/v1/user/followorunfollow/${userId}`,
         {},
-        { withCredentials: true } // Ensuring cookies are sent
+        { withCredentials: true }
       );
-
-      // Ensure res.data exists before accessing it
-      if (res && res.data) {
-        if (res.data.success) {
-          const updatedFollowers = isFollowing
-            ? userProfileFollowers - 1
-            : userProfileFollowers + 1;
-          setUserProfileFollowers(updatedFollowers);
-          setIsFollowing(!isFollowing);
-          dispatch(setAuthUser(res.data.user));
-          dispatch(setUserProfile(res.data.followingUser));
-          toast.success(res.data.message);
-        } else {
-          toast.info(res.data.message);
-        }
+  
+      if (res?.data?.success) {
+        const updatedFollowers = isFollowing
+          ? userProfileFollowers - 1
+          : userProfileFollowers + 1;
+        setUserProfileFollowers(updatedFollowers);
+        setIsFollowing(!isFollowing);
+        dispatch(setAuthUser(res.data.user));
+  
+        // 🔥 Re-fetch the full user profile to get updated posts with images
+        const userProfileRes = await axios.get(
+          `http://localhost:5000/api/v1/user/profile/${userId}`,
+          { withCredentials: true }
+        );
+        dispatch(setUserProfile(userProfileRes.data.user));
+  
+        toast.success(res.data.message);
       } else {
-        toast.error("Unexpected response structure");
+        toast.info(res.data.message);
       }
     } catch (error) {
-      // Handle error gracefully
       toast.error(error?.response?.data?.message || "An error occurred.");
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleMessage = () => {
     dispatch(setSelectedUser(userProfile));

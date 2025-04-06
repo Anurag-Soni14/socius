@@ -13,7 +13,7 @@ const SavedPostsPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-6">Commented Posts</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Saved Posts</h1>
       {SavedPosts.length > 0 ? (
         SavedPosts.map((post) => <Postframe key={post._id} post={post} />)
       ) : (

@@ -47,7 +47,7 @@ const UserManagement = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     setFilteredUsers(
-      users.filter((user) => user.username.toLowerCase().includes(value))
+      users.filter((user) => user.username?.toLowerCase().includes(value))
     );
   };
 
@@ -162,13 +162,13 @@ const UserManagement = () => {
               {filteredUsers.map((user, index) => (
                 <tr key={user._id} className="even:bg-base-200 odd:bg-base-100">
                   <td className="p-4">{index + 1}</td>
-                  <td className="p-4">{user.username}</td>
-                  <td className="p-4">{user.email}</td>
-                  <td className="p-4">{user.isAdmin ? "Admin" : "User"}</td>
+                  <td className="p-4">{user?.username}</td>
+                  <td className="p-4">{user?.email}</td>
+                  <td className="p-4">{user?.isAdmin ? "Admin" : "User"}</td>
                   <td className="p-4 flex justify-center items-center gap-4">
                     <button
                       className="bg-green-500 text-white px-3 py-1 rounded"
-                      onClick={() => handleEditNavigation(user._id)}
+                      onClick={() => handleEditNavigation(user?._id)}
                     >
                       <FaEdit />
                     </button>

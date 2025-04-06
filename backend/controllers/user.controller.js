@@ -6,6 +6,10 @@ import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
 import { Contact } from "../models/contact-model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
+import { Comment } from "../models/comment.model.js";
+import { Message } from "../models/message.model.js";
+import Conversation from "../models/conversation.model.js";
+import { Report } from "../models/report.model.js";
 
 export const register = async (req, res) => {
   try {
@@ -695,28 +699,70 @@ export const editUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
+
     if (!userId) {
-      return res.status(400).json({
-        message: "User ID is required",
-        success: false,
-      });
+      return res.status(400).json({ message: "User ID is required", success: false });
     }
-    const user = await User
-      .findById(userId)
-      .select("-password");
+
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
+      return res.status(404).json({ message: "User not found", success: false });
     }
+
+    // 1. Delete user's posts
+    await Post.deleteMany({ author: userId });
+
+    // 2. Delete comments by user
+    await Comment.deleteMany({ author: userId });
+
+    // 3. Remove likes and saved references from all posts
+    await Post.updateMany(
+      { likes: userId },
+      { $pull: { likes: userId } }
+    );
+    await Post.updateMany(
+      { saved: userId },
+      { $pull: { saved: userId } }
+    );
+
+    // 4. Delete messages sent or received
+    await Message.deleteMany({ $or: [{ senderId: userId }, { receiverId: userId }] });
+
+    // 5. Delete conversations where user is a participant
+    await Conversation.deleteMany({ participants: userId });
+
+    // 6. Delete reports made by the user
+    await Report.deleteMany({ user: userId });
+
+    // 7. Remove user from other users' followers and followings
+    await User.updateMany(
+      { followers: userId },
+      { $pull: { followers: userId } }
+    );
+    await User.updateMany(
+      { followings: userId },
+      { $pull: { followings: userId } }
+    );
+
+    // 8. (Optional) Remove from blockedUsers if used
+    await User.updateMany(
+      { blockedUsers: userId },
+      { $pull: { blockedUsers: userId } }
+    );
+
+    // 9. Finally, delete the user
     await User.findByIdAndDelete(userId);
+
     return res.status(200).json({
-      message: "User deleted successfully",
+      message: "User and all associated data deleted successfully",
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Error deleting user:", error);
+    return res.status(500).json({
+      message: "Something went wrong while deleting the user",
+      success: false,
+    });
   }
 };
 

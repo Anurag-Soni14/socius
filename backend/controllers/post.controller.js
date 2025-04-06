@@ -79,6 +79,37 @@ export const getAllPost = async (req, res) => {
   }
 };
 
+export const getFollowingUsersPosts = async (req, res) => {
+  try {
+    const loggedInUserId = req.id; // Assume middleware sets req.user
+
+    const user = await User.findById(loggedInUserId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    const followings = user.followings;
+
+    // Fetch posts from followed users
+    const posts = await Post.find({ author: { $in: followings } })
+      .populate("author", "username profilePic fullname") // only basic info
+      .sort({ createdAt: -1 }); // latest first
+
+    return res.status(200).json({
+      success: true,
+      message: "Posts from followed users fetched successfully",
+      posts,
+    });
+
+  } catch (error) {
+    console.error("Error fetching followed users' posts:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch posts",
+    });
+  }
+};
+
 // export const getAllPost = async (req, res) => {
 //   try {
 //     const { page = 1, limit = 10 } = req.query; // Default values for pagination

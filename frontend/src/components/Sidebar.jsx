@@ -83,6 +83,8 @@ function Sidebar() {
       dispatch(markNotificationsAsSeen()); // Clear unseen notifications
     } else if (menu === "Search") {
       navigate("/search");
+    } else if (menu === "Explore") {
+      navigate("/explore");
     }
   };
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import isAuthenticated from '../middlewares/isAuthenticated.js';
-import { addComment, addNewPost, deletePost, dislikePost, editPost, getAllPost, getCommentOfPost, getPostStats, getSinglePost, getUserPost, likePost, postDelete, savedPost } from '../controllers/post.controller.js';
+import { addComment, addNewPost, deletePost, dislikePost, editPost, getAllPost, getCommentOfPost, getFollowingUsersPosts, getPostStats, getSinglePost, getUserPost, likePost, postDelete, savedPost } from '../controllers/post.controller.js';
 import upload from '../middlewares/multer.js';
 import isAdmin from '../middlewares/isAdmin.js';
 
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.route('/addpost').post(isAuthenticated, upload.single('image'), addNewPost)
 router.route('/all').get(isAuthenticated, getAllPost)
+router.route('/following-posts').get(isAuthenticated, getFollowingUsersPosts)
 router.route('/userpost/all').get(isAuthenticated, getUserPost)
 router.route('/:id/like').get(isAuthenticated, likePost)
 router.route('/:id/dislike').get(isAuthenticated, dislikePost)
