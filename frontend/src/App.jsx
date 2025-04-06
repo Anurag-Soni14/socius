@@ -40,6 +40,15 @@ import AdminContactMessage from "./Pages/AdminContactMessage";
 import SavedPostsPage from "./Pages/SavedPostsPage";
 import { toast } from "sonner";
 import ExplorePage from "./Pages/ExplorePage";
+import BlockedUsers from "./Pages/BlockedUsers";
+import MyActivityStatus from "./Pages/MyActivityStatus";
+import MessagePrivacySettings from "./Pages/MessagePrivacySettings";
+import PushNotificationSettings from "./Pages/PushNotificationSettings";
+import EmailAlertSettings from "./Pages/EmailAlertSettings ";
+import SmsNotificationSettings from "./Pages/SmsNotificationSettings";
+import ChangePassword from "./Pages/ChangePassword";
+import TwoFactorAuth from "./Pages/TwoFactorAuth";
+import LoginActivity from "./Pages/LoginActivity";
 
 const browserRouter = createBrowserRouter([
   {
@@ -55,6 +64,15 @@ const browserRouter = createBrowserRouter([
       { path: "/explore", element: <ExplorePage /> },
       { path: "/profile/:id", element: <Profile /> },
       { path: "/account/settings", element: <Setting /> },
+      { path: "/account/blocked-users", element: <BlockedUsers/>},
+      { path: "/my-activity", element: <MyActivityStatus/>},
+      { path: "/message-privacy", element: <MessagePrivacySettings/>},
+      { path: "/push-notifications", element: <PushNotificationSettings/>},
+      { path: "/email-alerts", element: <EmailAlertSettings/>},
+      { path: "/sms-notifications", element: <SmsNotificationSettings/>},
+      { path: "/change-password", element: <ChangePassword/>},
+      { path: "/security/2fa", element: <TwoFactorAuth/>},
+      { path: "/security/login-activity", element: <LoginActivity/>},
       { path: "/account/settings/edit-profile", element: <EditProfile /> },
       { path: "/account/settings/change-theme", element: <ChangeTheme /> },
       { path: "/message", element: <MessagePage /> },
